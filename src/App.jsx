@@ -24,6 +24,7 @@ export default function App() {
     setActiveLang,
     rateCard,
     importDeck,
+    loadReadyDeck,
     addAlarm,
     delAlarm,
   } = useEagleState()
@@ -117,6 +118,7 @@ export default function App() {
           onSetLang={setActiveLang}
           onRate={rateCard}
           onImport={importDeck}
+          onLoadReady={loadReadyDeck}
         />
       )}
 

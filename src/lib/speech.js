@@ -3,20 +3,17 @@
 // ücretsiz, Android/iOS'ta çalışır. Tarayıcı (dev): Web Speech API.
 // Not: Android WebView tarayıcı Web Speech'i desteklemediği için telefonda
 // mutlaka native plugin kullanılır.
+// NOT: Eklenti STATİK import edilir (dinamik import() Android WebView'da
+// takılabildiği için).
 import { Capacitor } from '@capacitor/core'
+import { SpeechRecognition } from '@capacitor-community/speech-recognition'
 
 const isNative = Capacitor.isNativePlatform()
-let Plugin = null
 let webRec = null
 let lastPartial = ''
 
 async function getPlugin() {
-  if (!isNative) return null
-  if (!Plugin) {
-    const mod = await import('@capacitor-community/speech-recognition')
-    Plugin = mod.SpeechRecognition
-  }
-  return Plugin
+  return isNative ? SpeechRecognition : null
 }
 
 function webSupported() {

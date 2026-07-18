@@ -2,18 +2,15 @@
 // Native tarafta Capacitor LocalNotifications kullanır: telefon kilitliyken,
 // hatta uygulama kapalıyken bile her gün tekrarlanan bildirim/alarm verir.
 // Tarayıcıda ise Web Notification API'sine düşer (yalnızca sayfa açıkken).
+// NOT: Eklenti STATİK import edilir (dinamik import() Android WebView'da
+// açılışta takılabildiği için).
 import { Capacitor } from '@capacitor/core'
+import { LocalNotifications } from '@capacitor/local-notifications'
 
 const isNative = Capacitor.isNativePlatform()
-let LocalNotifications = null
 
 async function getLN() {
-  if (!isNative) return null
-  if (!LocalNotifications) {
-    const mod = await import('@capacitor/local-notifications')
-    LocalNotifications = mod.LocalNotifications
-  }
-  return LocalNotifications
+  return isNative ? LocalNotifications : null
 }
 
 // "HH:MM" biçimindeki alarm için kararlı bir sayısal id üretir.

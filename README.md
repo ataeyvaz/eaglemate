@@ -41,6 +41,15 @@ Diller: **İngilizce, Almanca, İspanyolca** (dil seçici; her dilin ayrı deste
   aktarma. Biçim: `{ "language": "en", "cards": [{ "target", "translation", "type", "scenario" }] }`
   (veya doğrudan kart dizisi). Kart id'leri hedef metinden türetildiği için yeniden
   aktarımda tekrar durumu korunur.
+- **Hazır desteler (aguilangevotr köprüsü)**: `scripts/import-from-aguilang.mjs`, komşu
+  `aguilangevotr` projesinin çekirdek kelime verisini (A1, 5-dilli şema) EagleMate
+  formatına çevirip `src/content/aguilang-{en,de,es}.json` üretir. Uygulamada "Hazır A1
+  destesini yükle" ile tek dokunuşla eklenir (~570 kelime/dil). Büyük destede günde en
+  fazla `DAILY_NEW_LIMIT` (10) yeni kart sunulur; gerisi aralıklı tekrarla açılır.
+
+> **Android WebView notu:** Capacitor eklentileri **statik** import edilir (dinamik
+> `import()` bazı WebView'larda açılışta takılıp "Yükleniyor…" ekranında donmaya yol
+> açıyordu). Ayrıca ilk yüklemede 4 sn'lik güvence zamanlayıcısı var.
 
 ## Teknoloji
 

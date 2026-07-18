@@ -5,6 +5,7 @@ import { dayKey, todayKey } from '../lib/date'
 import { sessionCountableIds } from '../data/program'
 import { SEED_DECKS, normalizeCard } from '../data/languages'
 import { schedule } from '../data/srs'
+import { READY_DECKS } from '../data/readyDecks'
 
 const STORAGE_KEY = 'eaglemate-data'
 
@@ -44,6 +45,13 @@ export function useEagleState() {
   // İlk yükleme
   useEffect(() => {
     let active = true
+
+    // Güvence: depolama herhangi bir sebeple (WebView takılması vb.) 4 sn içinde
+    // yanıt vermezse yine de arayüzü aç — "Yükleniyor…" ekranında donmayı önler.
+    const safety = setTimeout(() => {
+      if (active) setLoaded(true)
+    }, 4000)
+
     ;(async () => {
       try {
         const raw = await storage.get(STORAGE_KEY)
@@ -63,11 +71,15 @@ export function useEagleState() {
       } catch {
         /* henüz veri yok */
       } finally {
-        if (active) setLoaded(true)
+        if (active) {
+          clearTimeout(safety)
+          setLoaded(true)
+        }
       }
     })()
     return () => {
       active = false
+      clearTimeout(safety)
     }
   }, [])
 
@@ -205,6 +217,29 @@ export function useEagleState() {
     return cards.length
   }, [])
 
+  // aguilangevotr'dan üretilmiş hazır A1 destesini mevcut desteyle birleştirir
+  // (id bazlı tekilleştirme — var olan tekrar durumu korunur).
+  const loadReadyDeck = useCallback((code) => {
+    const ready = (READY_DECKS[code] || [])
+      .map((c) => normalizeCard(code, c))
+      .filter(Boolean)
+    if (ready.length === 0) return 0
+    setData((prev) => {
+      const existing = prev.lang.decks[code] || []
+      const byId = new Map(existing.map((c) => [c.id, c]))
+      for (const c of ready) if (!byId.has(c.id)) byId.set(c.id, c)
+      return {
+        ...prev,
+        lang: {
+          ...prev.lang,
+          activeLang: code,
+          decks: { ...prev.lang.decks, [code]: [...byId.values()] },
+        },
+      }
+    })
+    return ready.length
+  }, [])
+
   // ---- Alarm aksiyonları ----
   const addAlarm = useCallback((time, label) => {
     if (!time) return
@@ -238,6 +273,7 @@ export function useEagleState() {
     setActiveLang,
     rateCard,
     importDeck,
+    loadReadyDeck,
     addAlarm,
     delAlarm,
   }

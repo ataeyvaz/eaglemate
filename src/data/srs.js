@@ -31,3 +31,23 @@ export function isLearned(entry) {
 export function dueCards(deck, srs, today = todayKey()) {
   return deck.filter((c) => isDue(srs?.[c.id], today))
 }
+
+// Desteyi "tekrar" (planı gelmiş) ve "yeni" (hiç çalışılmamış) diye ayırır.
+export function splitDue(deck, srs, today = todayKey()) {
+  const reviews = []
+  const news = []
+  for (const c of deck) {
+    const e = srs?.[c.id]
+    if (!e || !e.due) news.push(c)
+    else if (e.due <= today) reviews.push(c)
+  }
+  return { reviews, news }
+}
+
+// Günlük çalışma kuyruğu: tüm planı gelmiş tekrarlar + en fazla `newLimit` yeni
+// kart. Büyük destelerde (yüzlerce kelime) hepsi birden gelmesin diye.
+export const DAILY_NEW_LIMIT = 10
+export function sessionQueue(deck, srs, today = todayKey(), newLimit = DAILY_NEW_LIMIT) {
+  const { reviews, news } = splitDue(deck, srs, today)
+  return { queue: [...reviews, ...news.slice(0, newLimit)], reviews: reviews.length, news: Math.min(news.length, newLimit) }
+}

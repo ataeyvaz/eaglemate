@@ -1,27 +1,39 @@
 import { useMemo, useState } from 'react'
 import { LANGUAGES, LANG_ORDER } from '../data/languages'
-import { dueCards, isLearned } from '../data/srs'
+import { sessionQueue, isLearned } from '../data/srs'
+import { READY_META } from '../data/readyDecks'
 import Dictation from './Dictation'
 import Quiz from './Quiz'
 import ImportDeck from './ImportDeck'
 
 // Dil sekmesi: dil seçimi + günün tekrarları + dikte / quiz / içe aktarma.
-export default function Language({ lang, onSetLang, onRate, onImport }) {
+export default function Language({ lang, onSetLang, onRate, onImport, onLoadReady }) {
   const [view, setView] = useState('home') // home | dictation | quiz | import
+  const [msg, setMsg] = useState(null)
 
   const active = lang.activeLang
   const langMeta = LANGUAGES[active]
   const deck = lang.decks[active] || []
 
-  const due = useMemo(() => dueCards(deck, lang.srs), [deck, lang.srs])
+  const { queue, reviews, news } = useMemo(
+    () => sessionQueue(deck, lang.srs),
+    [deck, lang.srs]
+  )
   const learnedCount = deck.filter((c) => isLearned(lang.srs[c.id])).length
+  const readyMeta = READY_META[active]
+  // Hazır deste zaten yüklü mü? (deste boyutu hazır deste kadar veya fazlaysa)
+  const readyLoaded = deck.length >= (readyMeta?.count || Infinity)
+
+  function loadReady() {
+    const n = onLoadReady(active)
+    setMsg(`${langMeta.label} A1 destesi yüklendi (${n} kelime) ✓`)
+    setTimeout(() => setMsg(null), 3000)
+  }
 
   if (view === 'dictation') {
-    // Tekrarı olan varsa onları, yoksa tüm desteyi çalış
-    const queue = due.length ? due : deck
     return (
       <Dictation
-        cards={queue}
+        cards={queue.length ? queue : deck.slice(0, 10)}
         langMeta={langMeta}
         onRate={onRate}
         onExit={() => setView('home')}
@@ -33,11 +45,7 @@ export default function Language({ lang, onSetLang, onRate, onImport }) {
   }
   if (view === 'import') {
     return (
-      <ImportDeck
-        activeLang={active}
-        onImport={onImport}
-        onExit={() => setView('home')}
-      />
+      <ImportDeck activeLang={active} onImport={onImport} onExit={() => setView('home')} />
     )
   }
 
@@ -68,11 +76,11 @@ export default function Language({ lang, onSetLang, onRate, onImport }) {
               {deck.length} kart · {learnedCount} pekişti
             </p>
           </div>
-          <div className="session-badge">{due.length}</div>
+          <div className="session-badge">{queue.length}</div>
         </div>
         <div className="badge-note">
-          {due.length > 0
-            ? `Bugün ${due.length} kart tekrar zamanı. Dikte ile başla!`
+          {queue.length > 0
+            ? `Bugün ${reviews} tekrar + ${news} yeni kart seni bekliyor. Dikte ile başla!`
             : 'Bugünlük tekrar yok 👏 İstersen yine de pratik yapabilirsin.'}
         </div>
       </div>
@@ -95,10 +103,33 @@ export default function Language({ lang, onSetLang, onRate, onImport }) {
           🎯 Mini quiz
           <span className="mode-sub">Çoktan seçmeli anlam eşleştirme</span>
         </button>
+      </div>
+
+      {/* İçerik yönetimi */}
+      <div className="card">
+        <h2>Kelime desteleri</h2>
+        {readyMeta && !readyLoaded && (
+          <button className="mode-btn ghost" onClick={loadReady}>
+            📦 Hazır {readyMeta.level} destesini yükle
+            <span className="mode-sub">
+              aguilangevotr'dan {readyMeta.count} kelime — tek dokunuşla
+            </span>
+          </button>
+        )}
+        {readyLoaded && (
+          <div className="badge-note" style={{ marginBottom: 10 }}>
+            Hazır {readyMeta.level} destesi yüklü ✓ ({deck.length} kart)
+          </div>
+        )}
         <button className="mode-btn ghost" onClick={() => setView('import')}>
-          📥 Kartları içe aktar
-          <span className="mode-sub">aguilangevotr'dan JSON ile</span>
+          📥 JSON ile içe aktar
+          <span className="mode-sub">aguilangevotr dışa aktarımı veya elle</span>
         </button>
+        {msg && (
+          <div className="badge-note" style={{ marginTop: 10, color: 'var(--green)' }}>
+            {msg}
+          </div>
+        )}
       </div>
     </>
   )

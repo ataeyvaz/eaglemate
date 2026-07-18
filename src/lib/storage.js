@@ -2,43 +2,35 @@
 // Native (telefon) tarafında Capacitor Preferences kullanır; tarayıcıda
 // localStorage'a düşer. Böylece aynı kod hem `npm run dev` ile tarayıcıda
 // hem de kurulu uygulamada çalışır.
+//
+// NOT: Eklenti STATİK import edilir. Dinamik import() bazı Android WebView'larda
+// açılışta chunk yüklemesinde takılıp söz (promise) hiç sonuçlanmadan asılı
+// kalabiliyor ve uygulama "Yükleniyor…" ekranında donuyordu.
 import { Capacitor } from '@capacitor/core'
+import { Preferences } from '@capacitor/preferences'
 
-let Preferences = null
 const isNative = Capacitor.isNativePlatform()
-
-async function getPrefs() {
-  if (!isNative) return null
-  if (!Preferences) {
-    const mod = await import('@capacitor/preferences')
-    Preferences = mod.Preferences
-  }
-  return Preferences
-}
 
 export const storage = {
   async get(key) {
-    const prefs = await getPrefs()
-    if (prefs) {
-      const { value } = await prefs.get({ key })
+    if (isNative) {
+      const { value } = await Preferences.get({ key })
       return value ?? null
     }
     return localStorage.getItem(key)
   },
 
   async set(key, value) {
-    const prefs = await getPrefs()
-    if (prefs) {
-      await prefs.set({ key, value })
+    if (isNative) {
+      await Preferences.set({ key, value })
       return
     }
     localStorage.setItem(key, value)
   },
 
   async remove(key) {
-    const prefs = await getPrefs()
-    if (prefs) {
-      await prefs.remove({ key })
+    if (isNative) {
+      await Preferences.remove({ key })
       return
     }
     localStorage.removeItem(key)
