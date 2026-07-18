@@ -3,6 +3,8 @@ import { storage } from '../lib/storage'
 import { notifications } from '../lib/notifications'
 import { dayKey, todayKey } from '../lib/date'
 import { sessionCountableIds } from '../data/program'
+import { SEED_DECKS, normalizeCard } from '../data/languages'
+import { schedule } from '../data/srs'
 
 const STORAGE_KEY = 'eaglemate-data'
 
@@ -12,6 +14,11 @@ const emptyData = {
   log: {}, //      { 'YYYY-MM-DD': { done, total } }
   sessions: {}, // { 'YYYY-MM-DD': { checked: { itemId: true }, full: bool } }
   program: { level: 1, levelSince: '2000-01-01' }, // antrenman ilerlemesi
+  lang: {
+    activeLang: 'en',
+    decks: SEED_DECKS, //  { en: [...], de: [...], es: [...] }
+    srs: {}, //           { cardId: { stage, due, lastResult } }
+  },
 }
 
 // Bir günün toplam tamamlanma sayısını (serbest görevler + o günün antrenman
@@ -46,6 +53,11 @@ export function useEagleState() {
             ...emptyData,
             ...parsed,
             program: { ...emptyData.program, ...(parsed.program || {}) },
+            lang: {
+              ...emptyData.lang,
+              ...(parsed.lang || {}),
+              decks: { ...emptyData.lang.decks, ...(parsed.lang?.decks || {}) },
+            },
           })
         }
       } catch {
@@ -73,6 +85,7 @@ export function useEagleState() {
             log: data.log,
             sessions: data.sessions,
             program: data.program,
+            lang: data.lang,
           })
         )
         .catch((e) => console.error('kaydetme hatası', e))
@@ -157,6 +170,41 @@ export function useEagleState() {
     }))
   }, [])
 
+  // ---- Dil modülü aksiyonları ----
+  const setActiveLang = useCallback((code) => {
+    setData((prev) => ({ ...prev, lang: { ...prev.lang, activeLang: code } }))
+  }, [])
+
+  // Kartı değerlendirir ve aralıklı tekrar planını günceller.
+  const rateCard = useCallback((cardId, result) => {
+    setData((prev) => {
+      const entry = prev.lang.srs[cardId]
+      const next = schedule(entry, result)
+      return {
+        ...prev,
+        lang: { ...prev.lang, srs: { ...prev.lang.srs, [cardId]: next } },
+      }
+    })
+  }, [])
+
+  // aguilangevotr'dan gelen kartları içe aktarır (o dilin destesini değiştirir).
+  // Dönen değer: içe aktarılan kart sayısı (0 = geçersiz).
+  const importDeck = useCallback((code, rawCards) => {
+    const cards = (Array.isArray(rawCards) ? rawCards : [])
+      .map((c) => normalizeCard(code, c))
+      .filter(Boolean)
+    if (cards.length === 0) return 0
+    setData((prev) => ({
+      ...prev,
+      lang: {
+        ...prev.lang,
+        activeLang: code,
+        decks: { ...prev.lang.decks, [code]: cards },
+      },
+    }))
+    return cards.length
+  }, [])
+
   // ---- Alarm aksiyonları ----
   const addAlarm = useCallback((time, label) => {
     if (!time) return
@@ -187,6 +235,9 @@ export function useEagleState() {
     delTask,
     toggleSessionItem,
     setLevel,
+    setActiveLang,
+    rateCard,
+    importDeck,
     addAlarm,
     delAlarm,
   }

@@ -1,7 +1,8 @@
 const TABS = [
   { key: 'today', label: 'Bugün' },
   { key: 'training', label: 'Antrenman' },
-  { key: 'timer', label: 'Zamanlayıcı' },
+  { key: 'lang', label: 'Dil' },
+  { key: 'timer', label: 'Sayaç' },
   { key: 'progress', label: 'İlerleme' },
 ]
 

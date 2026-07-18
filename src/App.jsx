@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Tabs from './components/Tabs'
 import TaskList from './components/TaskList'
 import Training from './components/Training'
+import Language from './components/Language'
 import TimerTab from './components/TimerTab'
 import Progress from './components/Progress'
 import Toast from './components/Toast'
@@ -20,6 +21,9 @@ export default function App() {
     delTask,
     toggleSessionItem,
     setLevel,
+    setActiveLang,
+    rateCard,
+    importDeck,
     addAlarm,
     delAlarm,
   } = useEagleState()
@@ -104,6 +108,15 @@ export default function App() {
           sessions={data.sessions}
           onToggleItem={toggleSessionItem}
           onSetLevel={setLevel}
+        />
+      )}
+
+      {tab === 'lang' && (
+        <Language
+          lang={data.lang}
+          onSetLang={setActiveLang}
+          onRate={rateCard}
+          onImport={importDeck}
         />
       )}
 

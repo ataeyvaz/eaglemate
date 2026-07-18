@@ -15,6 +15,7 @@
     "open:ios": "cap open ios"
   },
   "dependencies": {
+    "@capacitor-community/speech-recognition": "^6.0.0",
     "@capacitor/app": "^6.0.0",
     "@capacitor/core": "^6.1.2",
     "@capacitor/local-notifications": "^6.1.0",

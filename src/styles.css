@@ -99,9 +99,9 @@ body {
 .tab {
   flex: 1;
   text-align: center;
-  padding: 9px 4px;
+  padding: 9px 2px;
   border-radius: 9px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
@@ -110,6 +110,7 @@ body {
   background: none;
   border: none;
   font-family: inherit;
+  white-space: nowrap;
 }
 .tab.active {
   background: var(--cyan);
@@ -526,4 +527,226 @@ button {
   background: var(--cyan);
   color: #03222b;
   border-color: var(--cyan);
+}
+
+/* ---- Dil modülü (Faz 3) ---- */
+.lang-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.lang-pill {
+  flex: 1;
+  min-width: 90px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.lang-pill.active {
+  background: var(--cyan);
+  color: #03222b;
+  border-color: var(--cyan);
+}
+
+/* mod butonları (dikte / quiz / içe aktar) */
+.mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 11px;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.mode-btn:last-child {
+  margin-bottom: 0;
+}
+.mode-btn.ghost {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.mode-btn:disabled {
+  opacity: 0.5;
+}
+.mode-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.btn-add.mode-btn .mode-sub {
+  color: #04343d;
+}
+
+/* dikte ekranı */
+.dict-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 2px;
+  font-family: inherit;
+}
+.scenario-tag {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--amber);
+  background: var(--panel-2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+}
+.dict-target {
+  font-family: 'Oswald', sans-serif;
+  font-size: 28px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.dict-translation {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.mic-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 11px;
+  background: var(--cyan);
+  color: #03222b;
+  font-size: 15px;
+  margin-top: 14px;
+}
+.mic-btn.listening {
+  background: var(--red);
+  color: #fff;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+.dict-spoken {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+.dict-spoken-label {
+  color: var(--muted);
+}
+.dict-result {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.dict-score {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.dict-score b {
+  color: var(--green);
+  font-size: 18px;
+  font-family: 'Oswald', sans-serif;
+}
+.dict-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 16px;
+}
+.dict-words span {
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.w-ok {
+  background: rgba(52, 211, 153, 0.18);
+  color: var(--green);
+}
+.w-bad {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--red);
+}
+.manual-fallback {
+  margin-top: 14px;
+}
+.rate-btns {
+  display: flex;
+  gap: 8px;
+}
+.rate {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+.rate.again {
+  background: var(--panel-2);
+  color: var(--amber);
+  border: 1px solid var(--line);
+}
+.rate.good {
+  background: var(--green);
+  color: #04241a;
+}
+
+/* quiz */
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+.quiz-opt {
+  width: 100%;
+  text-align: left;
+  padding: 13px 14px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+.quiz-opt.correct {
+  background: rgba(52, 211, 153, 0.2);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  background: rgba(248, 113, 113, 0.16);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* içe aktarma */
+.import-area {
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 9px;
+  padding: 12px;
+  font-size: 13px;
+  font-family: 'Consolas', monospace;
+  resize: vertical;
 }

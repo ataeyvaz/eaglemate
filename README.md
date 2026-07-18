@@ -3,10 +3,10 @@
 Günlük görev, antrenman, zamanlayıcı ve **gerçek arka plan alarmı** olan mobil uygulama.
 Yol haritası için bkz. [`eaglemate-yol-haritasi.md`](./eaglemate-yol-haritasi.md).
 
-Bu depo **Faz 1 (MVP)** + **Faz 2 (Antrenman program mantığı)** çıktısıdır:
-`eaglemate.html` prototipi React + Vite + Capacitor tabanlı, telefona kurulabilen bir
-uygulamaya taşınmış ve "rastgele checklist" olan antrenman sekmesi gerçek bir program
-motoruna dönüştürülmüştür.
+Bu depo **Faz 1 (MVP)** + **Faz 2 (Antrenman program mantığı)** + **Faz 3 (Dil modülü)**
+çıktısıdır: `eaglemate.html` prototipi React + Vite + Capacitor tabanlı, telefona
+kurulabilen bir uygulamaya taşınmış; antrenman sekmesi gerçek bir program motoruna
+dönüştürülmüş; dikte + aralıklı tekrar tabanlı bir dil öğrenme modülü eklenmiştir.
 
 ### Faz 2 — Antrenman programı
 
@@ -23,6 +23,24 @@ Profil: **11-13 yaş, futbol oynuyor, biraz kilolu, sadece vücut ağırlığı.
 - **Kişisel güvenlik**: gölge boksu (duruş, jab, cross, kombinasyon, serbest tur).
 - **Otomatik seviye atlama**: mevcut seviyede yeterli antrenman tamamlanınca "seviye atla"
   önerisi (streak/tamamlama tabanlı); manuel seviye seçimi de var.
+
+### Faz 3 — Dil öğrenme modülü
+
+Diller: **İngilizce, Almanca, İspanyolca** (dil seçici; her dilin ayrı destesi ve tekrar takibi).
+
+- **Dikte**: hedef cümle gösterilir → oğlun sesli söyler → konuşma tanıma metne çevirir →
+  kelime kelime yan yana karşılaştırma + %eşleşme puanı.
+- **Konuşma tanıma** (`src/lib/speech.js`): native'de `@capacitor-community/speech-recognition`
+  (cihaz üstü, ücretsiz), tarayıcıda Web Speech API. Mikrofonsuz cihazda "yazarak kontrol"
+  yedeği var. Karşılaştırma büyük/küçük harf, noktalama, aksan ve `ß`'ye karşı affedici.
+- **Aralıklı tekrar** (`src/data/srs.js`): bir kart doğru bilinince 1 → 3 → 7 → 16 gün
+  sonra tekrar sorulur; "zor" denilince ertesi güne döner. Ana ekranda "bugün tekrar
+  edilecek" sayısı gösterilir.
+- **Mini quiz**: Türkçe anlamı ver, 4 seçenekten doğru hedef cümleyi seç.
+- **İçe aktarma** (`src/components/ImportDeck.jsx`): aguilangevotr'dan JSON ile kart
+  aktarma. Biçim: `{ "language": "en", "cards": [{ "target", "translation", "type", "scenario" }] }`
+  (veya doğrudan kart dizisi). Kart id'leri hedef metinden türetildiği için yeniden
+  aktarımda tekrar durumu korunur.
 
 ## Teknoloji
 
@@ -79,22 +97,30 @@ src/
     Tabs.jsx            # 4 sekme
     TaskList.jsx        # "Bugün" serbest görev listesi
     Training.jsx        # Antrenman programı görünümü + seviye kontrolü (Faz 2)
+    Language.jsx        # Dil modülü ana ekranı (Faz 3)
+    Dictation.jsx       # Dikte: konuşma tanıma + karşılaştırma (Faz 3)
+    Quiz.jsx            # Çoktan seçmeli mini quiz (Faz 3)
+    ImportDeck.jsx      # JSON kart içe aktarma (Faz 3)
     TimerTab.jsx        # Zamanlayıcı + günlük hatırlatmalar
     Progress.jsx        # 7 günlük performans grafiği
     Toast.jsx
   hooks/
-    useEagleState.js    # kalıcı durum + görev/seans/alarm aksiyonları + streak/pct
+    useEagleState.js    # kalıcı durum + görev/seans/dil/alarm aksiyonları + streak/pct
     useTimer.js         # geri sayım zamanlayıcısı
   data/
     program.js          # egzersiz kütüphanesi + haftalık şablon + seans üreteci (Faz 2)
+    languages.js        # 3 dilin başlangıç desteleri + kart id/normalize (Faz 3)
+    srs.js              # aralıklı tekrar planlayıcı (Faz 3)
   lib/
     storage.js          # Preferences ⇄ localStorage soyutlaması
     notifications.js    # LocalNotifications ⇄ Web Notification soyutlaması
+    speech.js           # konuşma tanıma soyutlaması (native plugin ⇄ Web Speech) (Faz 3)
+    compare.js          # dikte metin karşılaştırma (Faz 3)
     date.js             # tarih/gün anahtarı yardımcıları
     sound.js            # zamanlayıcı bip sesi
 ```
 
 ## Sonraki fazlar
 
-Faz 1 ve Faz 2 tamamlandı. Sıradaki: Faz 3 (dil/dikte modülü), Faz 4 (kitap günlüğü),
-Faz 5 (native alarm inceliği), Faz 6 (opsiyonel ebeveyn takip paneli), Faz 7 (cilalama).
+Faz 1, 2 ve 3 tamamlandı. Sıradaki: Faz 4 (kitap günlüğü), Faz 5 (native alarm inceliği),
+Faz 6 (opsiyonel ebeveyn takip paneli), Faz 7 (cilalama).
