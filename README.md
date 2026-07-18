@@ -3,8 +3,26 @@
 Günlük görev, antrenman, zamanlayıcı ve **gerçek arka plan alarmı** olan mobil uygulama.
 Yol haritası için bkz. [`eaglemate-yol-haritasi.md`](./eaglemate-yol-haritasi.md).
 
-Bu depo **Faz 1 (MVP)** çıktısıdır: `eaglemate.html` prototipi React + Vite + Capacitor
-tabanlı, telefona kurulabilen bir uygulamaya taşınmıştır.
+Bu depo **Faz 1 (MVP)** + **Faz 2 (Antrenman program mantığı)** çıktısıdır:
+`eaglemate.html` prototipi React + Vite + Capacitor tabanlı, telefona kurulabilen bir
+uygulamaya taşınmış ve "rastgele checklist" olan antrenman sekmesi gerçek bir program
+motoruna dönüştürülmüştür.
+
+### Faz 2 — Antrenman programı
+
+Profil: **11-13 yaş, futbol oynuyor, biraz kilolu, sadece vücut ağırlığı.**
+
+- **Seviyeli (1-4) egzersiz kütüphanesi** (`src/data/program.js`): her hareketin paterni,
+  set/tekrar reçetesi, dinlenme süresi, teknik notu ve "⚠️ dikkat" uyarısı var.
+- **Isınma → ana hareketler → beceri → soğuma** akışı her gün otomatik üretilir.
+- **Haftalık şablon + dinlenme günü mantığı**: kuvvet günleri arasına çeviklik/dinlenme
+  serpiştirilerek aynı kas grubu üst üste yorulmaz.
+- **Eklem dostu tasarım**: fazla kilo eklemleri zorladığı için yüksek sıçrama/pliometri yok;
+  yumuşak iniş, kontrollü tempo, hareketlilik ön planda.
+- **Futbol desteği**: hızlı ayak, shuffle, top üstü dokunuş, tek ayak denge.
+- **Kişisel güvenlik**: gölge boksu (duruş, jab, cross, kombinasyon, serbest tur).
+- **Otomatik seviye atlama**: mevcut seviyede yeterli antrenman tamamlanınca "seviye atla"
+  önerisi (streak/tamamlama tabanlı); manuel seviye seçimi de var.
 
 ## Teknoloji
 
@@ -59,13 +77,16 @@ src/
   components/
     Header.jsx          # tamamlanma halkası + seri
     Tabs.jsx            # 4 sekme
-    TaskList.jsx        # Bugün / Antrenman ortak liste
+    TaskList.jsx        # "Bugün" serbest görev listesi
+    Training.jsx        # Antrenman programı görünümü + seviye kontrolü (Faz 2)
     TimerTab.jsx        # Zamanlayıcı + günlük hatırlatmalar
     Progress.jsx        # 7 günlük performans grafiği
     Toast.jsx
   hooks/
-    useEagleState.js    # kalıcı durum + görev/alarm aksiyonları + streak/pct
+    useEagleState.js    # kalıcı durum + görev/seans/alarm aksiyonları + streak/pct
     useTimer.js         # geri sayım zamanlayıcısı
+  data/
+    program.js          # egzersiz kütüphanesi + haftalık şablon + seans üreteci (Faz 2)
   lib/
     storage.js          # Preferences ⇄ localStorage soyutlaması
     notifications.js    # LocalNotifications ⇄ Web Notification soyutlaması
@@ -75,5 +96,5 @@ src/
 
 ## Sonraki fazlar
 
-Yol haritasındaki Faz 2–7 (antrenman program mantığı, dil/dikte modülü, kitap günlüğü,
-native alarm inceliği, opsiyonel ebeveyn takip paneli, cilalama) henüz yapılmadı.
+Faz 1 ve Faz 2 tamamlandı. Sıradaki: Faz 3 (dil/dikte modülü), Faz 4 (kitap günlüğü),
+Faz 5 (native alarm inceliği), Faz 6 (opsiyonel ebeveyn takip paneli), Faz 7 (cilalama).

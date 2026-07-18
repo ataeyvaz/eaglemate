@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Header from './components/Header'
 import Tabs from './components/Tabs'
 import TaskList from './components/TaskList'
+import Training from './components/Training'
 import TimerTab from './components/TimerTab'
 import Progress from './components/Progress'
 import Toast from './components/Toast'
@@ -11,7 +12,17 @@ import { notifications } from './lib/notifications'
 import { playBeep } from './lib/sound'
 
 export default function App() {
-  const { data, loaded, addTask, toggleTask, delTask, addAlarm, delAlarm } = useEagleState()
+  const {
+    data,
+    loaded,
+    addTask,
+    toggleTask,
+    delTask,
+    toggleSessionItem,
+    setLevel,
+    addAlarm,
+    delAlarm,
+  } = useEagleState()
   const [tab, setTab] = useState('today')
   const [toast, setToast] = useState(null)
 
@@ -88,14 +99,11 @@ export default function App() {
       )}
 
       {tab === 'training' && (
-        <TaskList
-          listName="training"
-          title="Antrenman listesi"
-          placeholder="Örn. 20 şınav..."
-          items={data.training}
-          onAdd={addTask}
-          onToggle={toggleTask}
-          onDelete={delTask}
+        <Training
+          program={data.program}
+          sessions={data.sessions}
+          onToggleItem={toggleSessionItem}
+          onSetLevel={setLevel}
         />
       )}
 

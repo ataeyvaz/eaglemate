@@ -390,3 +390,140 @@ button {
 .toast.show {
   opacity: 1;
 }
+
+/* ---- Antrenman programı (Faz 2) ---- */
+.session-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.session-head h2 {
+  margin: 0;
+}
+.session-sub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.session-badge {
+  flex-shrink: 0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  color: var(--cyan);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+.session-badge.rest {
+  color: var(--amber);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+.session-bar {
+  height: 8px;
+  background: var(--panel-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.session-bar-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 6px;
+  transition: width 0.35s ease;
+}
+
+.levelup {
+  border-color: var(--green);
+  background: linear-gradient(180deg, rgba(52, 211, 153, 0.08), var(--panel));
+}
+.btn-levelup {
+  background: var(--green);
+  color: #04241a;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-size: 14px;
+  width: 100%;
+}
+.btn-levelup:active {
+  transform: scale(0.98);
+}
+
+/* egzersiz satırı (tıklanabilir kart) */
+.ex {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 2px;
+  font-weight: 400;
+  color: var(--text);
+}
+.ex:last-child {
+  border-bottom: none;
+}
+.ex .check {
+  margin-top: 2px;
+}
+.ex-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.ex-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.ex.done .ex-title {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.ex-detail {
+  font-size: 13px;
+  color: var(--cyan);
+  font-weight: 600;
+}
+.ex-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+.ex-caution {
+  font-size: 12px;
+  color: var(--amber);
+  line-height: 1.4;
+}
+
+/* seviye kontrolü */
+.level-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.level-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 15px;
+  font-family: 'Oswald', sans-serif;
+}
+.level-pill.active {
+  background: var(--cyan);
+  color: #03222b;
+  border-color: var(--cyan);
+}

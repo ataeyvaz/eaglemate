@@ -2,14 +2,30 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { storage } from '../lib/storage'
 import { notifications } from '../lib/notifications'
 import { dayKey, todayKey } from '../lib/date'
+import { sessionCountableIds } from '../data/program'
 
 const STORAGE_KEY = 'eaglemate-data'
 
 const emptyData = {
-  today: [],
-  training: [],
+  today: [], // "Bugün" sekmesindeki serbest günlük görevler
   alarms: [],
-  log: {}, // { 'YYYY-MM-DD': { done, total } }
+  log: {}, //      { 'YYYY-MM-DD': { done, total } }
+  sessions: {}, // { 'YYYY-MM-DD': { checked: { itemId: true }, full: bool } }
+  program: { level: 1, levelSince: '2000-01-01' }, // antrenman ilerlemesi
+}
+
+// Bir günün toplam tamamlanma sayısını (serbest görevler + o günün antrenman
+// seansı) hesaplar. Streak ve halka yüzdesi buradan beslenir.
+function dayCounts(data, dateKey = todayKey()) {
+  const level = data.program?.level || 1
+  const ids = sessionCountableIds(dateKey, level)
+  const checked = data.sessions?.[dateKey]?.checked || {}
+  const sessionDone = ids.filter((id) => checked[id]).length
+  const todayDone = data.today.filter((x) => x.done).length
+  return {
+    done: todayDone + sessionDone,
+    total: data.today.length + ids.length,
+  }
 }
 
 // Uygulamanın tüm kalıcı durumunu ve üzerinde işlem yapan aksiyonları döndürür.
@@ -26,7 +42,11 @@ export function useEagleState() {
         const raw = await storage.get(STORAGE_KEY)
         if (raw && active) {
           const parsed = JSON.parse(raw)
-          setData({ ...emptyData, ...parsed })
+          setData({
+            ...emptyData,
+            ...parsed,
+            program: { ...emptyData.program, ...(parsed.program || {}) },
+          })
         }
       } catch {
         /* henüz veri yok */
@@ -49,9 +69,10 @@ export function useEagleState() {
           STORAGE_KEY,
           JSON.stringify({
             today: data.today,
-            training: data.training,
             alarms: data.alarms,
             log: data.log,
+            sessions: data.sessions,
+            program: data.program,
           })
         )
         .catch((e) => console.error('kaydetme hatası', e))
@@ -59,18 +80,13 @@ export function useEagleState() {
     return () => saveTimer.current && clearTimeout(saveTimer.current)
   }, [data, loaded])
 
-  // Bugünün tamamlanma kaydını günceller (görev listeleri değişince çağrılır)
+  // Bugünün log kaydını (serbest görev + seans) yeniden hesaplar.
   const withUpdatedLog = useCallback((next) => {
-    const list = [...next.today, ...next.training]
-    const done = list.filter((x) => x.done).length
-    const total = list.length
-    return {
-      ...next,
-      log: { ...next.log, [todayKey()]: { done, total } },
-    }
+    const { done, total } = dayCounts(next)
+    return { ...next, log: { ...next.log, [todayKey()]: { done, total } } }
   }, [])
 
-  // ---- Görev / antrenman aksiyonları ----
+  // ---- Serbest günlük görev aksiyonları ("Bugün" sekmesi) ----
   const addTask = useCallback(
     (listName, text) => {
       const t = text.trim()
@@ -114,6 +130,33 @@ export function useEagleState() {
     [withUpdatedLog]
   )
 
+  // ---- Antrenman seansı aksiyonları ----
+  // Bir seans öğesini işaretler/kaldırır. allIds: o günün tüm sayılabilir
+  // öğe id'leri (tam tamamlanma tespiti için).
+  const toggleSessionItem = useCallback((itemId, allIds) => {
+    const dk = todayKey()
+    setData((prev) => {
+      const cur = prev.sessions?.[dk]?.checked || {}
+      const nextChecked = { ...cur, [itemId]: !cur[itemId] }
+      const done = allIds.filter((id) => nextChecked[id]).length
+      const full = allIds.length > 0 && done === allIds.length
+      const sessions = { ...prev.sessions, [dk]: { checked: nextChecked, full } }
+      const next = { ...prev, sessions }
+      const counts = dayCounts(next)
+      return { ...next, log: { ...next.log, [dk]: counts } }
+    })
+  }, [])
+
+  // Program seviyesini değiştirir (atla / düşür). levelSince sıfırlanır ki
+  // yeni seviyedeki tamamlanan günler baştan sayılsın.
+  const setLevel = useCallback((level) => {
+    const clamped = Math.max(1, Math.min(4, level))
+    setData((prev) => ({
+      ...prev,
+      program: { level: clamped, levelSince: todayKey() },
+    }))
+  }, [])
+
   // ---- Alarm aksiyonları ----
   const addAlarm = useCallback((time, label) => {
     if (!time) return
@@ -142,12 +185,14 @@ export function useEagleState() {
     addTask,
     toggleTask,
     delTask,
+    toggleSessionItem,
+    setLevel,
     addAlarm,
     delAlarm,
   }
 }
 
-// ---- Türetilmiş değerler (prototipteki hesaplamalar) ----
+// ---- Türetilmiş değerler ----
 export function computeStreak(log) {
   let streak = 0
   const d = new Date()
@@ -163,8 +208,9 @@ export function computeStreak(log) {
   return streak
 }
 
+// Bugünün tamamlanma yüzdesi (serbest görev + antrenman seansı birlikte).
 export function completionPct(data) {
-  const list = [...data.today, ...data.training]
-  if (list.length === 0) return 0
-  return Math.round((100 * list.filter((x) => x.done).length) / list.length)
+  const { done, total } = dayCounts(data)
+  if (total === 0) return 0
+  return Math.round((100 * done) / total)
 }
