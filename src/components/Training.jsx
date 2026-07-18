@@ -1,10 +1,57 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { todayKey } from '../lib/date'
 import {
   generateSession,
   completedTrainingDaysSince,
   LEVEL_UP_SESSIONS,
 } from '../data/program'
+import ExerciseFigure from './ExerciseFigure'
+
+// Tek egzersiz satırı: şekil + işaretleme + "nasıl yapılır?" açılır tarifi.
+function ExerciseItem({ item, checked, onToggle }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className={`ex-row ${checked ? 'done' : ''}`}>
+      <div className="ex-main">
+        <button
+          className={`check ${checked ? 'done' : ''}`}
+          aria-label={checked ? 'İşareti kaldır' : 'Tamamla'}
+          onClick={onToggle}
+        >
+          {checked ? '✓' : ''}
+        </button>
+        {item.illo && (
+          <div className="ex-figure-wrap">
+            <ExerciseFigure pose={item.illo} />
+          </div>
+        )}
+        <div className="ex-body">
+          <span className="ex-title">
+            {item.variant ? `${item.name} — ${item.variant}` : item.name}
+          </span>
+          <span className="ex-detail">
+            {item.detail}
+            {item.rest ? ` · dinlenme ${item.rest}` : ''}
+          </span>
+          {item.note && <span className="ex-note">{item.note}</span>}
+          {item.caution && <span className="ex-caution">⚠️ {item.caution}</span>}
+          {item.steps && (
+            <button className="ex-how" onClick={() => setOpen((o) => !o)}>
+              {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
+            </button>
+          )}
+        </div>
+      </div>
+      {open && item.steps && (
+        <ol className="ex-steps">
+          {item.steps.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ol>
+      )}
+    </div>
+  )
+}
 
 // Antrenman sekmesi: o günün programını üretir, öğeleri işaretletir, seviye
 // ilerlemesini yönetir.
@@ -70,26 +117,12 @@ export default function Training({ program, sessions, onToggleItem, onSetLevel }
         <div className="card" key={block.title}>
           <h2>{block.title}</h2>
           {block.items.map((it) => (
-            <button
+            <ExerciseItem
               key={it.id}
-              className={`ex ${checked[it.id] ? 'done' : ''}`}
-              onClick={() => onToggleItem(it.id, session.countableIds)}
-            >
-              <span className={`check ${checked[it.id] ? 'done' : ''}`}>
-                {checked[it.id] ? '✓' : ''}
-              </span>
-              <span className="ex-body">
-                <span className="ex-title">
-                  {it.variant ? `${it.name} — ${it.variant}` : it.name}
-                </span>
-                <span className="ex-detail">
-                  {it.detail}
-                  {it.rest ? ` · dinlenme ${it.rest}` : ''}
-                </span>
-                {it.note && <span className="ex-note">{it.note}</span>}
-                {it.caution && <span className="ex-caution">⚠️ {it.caution}</span>}
-              </span>
-            </button>
+              item={it}
+              checked={!!checked[it.id]}
+              onToggle={() => onToggleItem(it.id, session.countableIds)}
+            />
           ))}
         </div>
       ))}

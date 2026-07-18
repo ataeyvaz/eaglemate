@@ -510,6 +510,87 @@ button {
   line-height: 1.4;
 }
 
+/* ---- Egzersiz satırı: şekil + tarif (Faz 2.5) ---- */
+.ex-row {
+  border-bottom: 1px solid var(--line);
+  padding: 12px 2px;
+}
+.ex-row:last-child {
+  border-bottom: none;
+}
+.ex-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ex-main .check {
+  margin-top: 2px;
+}
+.ex-row.done .ex-title {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.ex-figure-wrap {
+  flex-shrink: 0;
+  width: 62px;
+  height: 50px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ex-figure {
+  display: block;
+  color: var(--cyan);
+}
+.ex-figure-stroke {
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ex-figure-extra {
+  stroke: var(--muted);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.ex-figure-ground {
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.ex-row.done .ex-figure {
+  color: var(--green);
+  opacity: 0.7;
+}
+.ex-how {
+  align-self: flex-start;
+  margin-top: 4px;
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 2px 0;
+  cursor: pointer;
+}
+.ex-steps {
+  margin: 8px 0 2px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.ex-steps li {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.45;
+}
+
 /* seviye kontrolü */
 .level-ctl {
   display: flex;
