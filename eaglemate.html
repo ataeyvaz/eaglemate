@@ -1,0 +1,465 @@
+<div id="app-root"></div>
+<style>
+  :root{
+    --bg:#0B1120;
+    --panel:#141C30;
+    --panel-2:#1B2540;
+    --line:#26314D;
+    --cyan:#22D3EE;
+    --amber:#FBBF24;
+    --green:#34D399;
+    --red:#F87171;
+    --text:#E5E9F0;
+    --muted:#8B98B8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  #app-root{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Rajdhani','Segoe UI',sans-serif;
+    min-height:100vh;
+    padding:0;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Oswald:wght@500;600;700&display=swap');
+  .display{font-family:'Oswald',sans-serif; letter-spacing:0.02em;}
+
+  .wrap{max-width:640px; margin:0 auto; padding:20px 18px 40px;}
+
+  .top{display:flex; align-items:center; gap:16px; margin-bottom:22px;}
+  .ring-wrap{position:relative; width:74px; height:74px; flex-shrink:0;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-bg{fill:none; stroke:var(--panel-2); stroke-width:7;}
+  .ring-fg{fill:none; stroke:var(--cyan); stroke-width:7; stroke-linecap:round; transition:stroke-dashoffset .5s ease;}
+  .ring-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700;}
+  .title-block h1{font-size:22px; margin:0 0 2px; color:#fff;}
+  .title-block p{margin:0; font-size:13px; color:var(--muted);}
+
+  .tabs{display:flex; gap:6px; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:4px;}
+  .tab{flex:1; text-align:center; padding:9px 4px; border-radius:9px; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; user-select:none; transition:.15s;}
+  .tab.active{background:var(--cyan); color:#03222b;}
+  .tab:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px;}
+  .card h2{font-size:14px; text-transform:uppercase; letter-spacing:.08em; color:var(--amber); margin:0 0 12px; font-weight:700;}
+
+  .row{display:flex; gap:8px; margin-bottom:10px;}
+  input[type=text], input[type=time], input[type=number]{
+    flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    border-radius:9px; padding:10px 12px; font-size:14px; font-family:inherit;
+  }
+  input:focus-visible, button:focus-visible, .task:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}
+  button{cursor:pointer; border:none; font-family:inherit; font-weight:700;}
+  .btn-add{background:var(--cyan); color:#03222b; border-radius:9px; padding:0 16px; font-size:14px;}
+  .btn-add:active{transform:scale(.97);}
+
+  .task{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--line);}
+  .task:last-child{border-bottom:none;}
+  .check{width:22px; height:22px; border-radius:7px; border:2px solid var(--muted); flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.15s;}
+  .check.done{background:var(--green); border-color:var(--green);}
+  .task-text{flex:1; font-size:15px;}
+  .task-text.done{color:var(--muted); text-decoration:line-through;}
+  .del{color:var(--muted); background:none; font-size:18px; padding:2px 6px; border-radius:6px;}
+  .del:hover{color:var(--red);}
+  .empty{color:var(--muted); font-size:13px; text-align:center; padding:14px 0;}
+
+  .timer-display{font-family:'Oswald',sans-serif; font-size:52px; text-align:center; letter-spacing:.03em; color:#fff; margin:6px 0 14px;}
+  .timer-btns{display:flex; gap:8px; justify-content:center; margin-bottom:6px;}
+  .timer-btns button{padding:10px 18px; border-radius:9px; font-size:14px;}
+  .btn-start{background:var(--green); color:#04241a;}
+  .btn-pause{background:var(--amber); color:#2b1e00;}
+  .btn-reset{background:var(--panel-2); color:var(--text); border:1px solid var(--line);}
+  .quick-times{display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;}
+  .qt{background:var(--panel-2); border:1px solid var(--line); color:var(--muted); padding:6px 12px; border-radius:20px; font-size:13px;}
+  .qt:hover{color:var(--text); border-color:var(--cyan);}
+
+  .alarm{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line);}
+  .alarm:last-child{border-bottom:none;}
+  .alarm-time{font-family:'Oswald'; font-size:18px; color:var(--cyan); min-width:64px;}
+  .alarm-label{flex:1; font-size:14px; color:var(--muted);}
+
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+  .stat{background:var(--panel-2); border-radius:10px; padding:14px; text-align:center;}
+  .stat .num{font-family:'Oswald'; font-size:28px; color:var(--cyan); display:block;}
+  .stat .lbl{font-size:12px; color:var(--muted); margin-top:2px;}
+  .bars{display:flex; align-items:flex-end; gap:6px; height:80px; margin-top:8px;}
+  .bar-col{flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .bar{width:100%; background:var(--panel-2); border-radius:4px 4px 0 0; position:relative; min-height:4px;}
+  .bar-fill{position:absolute; bottom:0; left:0; right:0; background:var(--cyan); border-radius:4px 4px 0 0;}
+  .bar-day{font-size:10px; color:var(--muted);}
+
+  .badge-note{font-size:12px; color:var(--muted); background:var(--panel-2); border-radius:9px; padding:10px 12px; line-height:1.5;}
+  .toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--green); color:#04241a; padding:10px 18px; border-radius:20px; font-size:13px; font-weight:700; box-shadow:0 8px 24px rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:opacity .3s;}
+  .toast.show{opacity:1;}
+</style>
+<script>
+(function(){
+  const root = document.getElementById('app-root');
+  let state = {
+    tab: 'today',
+    today: [],
+    training: [],
+    alarms: [],
+    log: {}, // { 'YYYY-MM-DD': {done, total} }
+    timerSeconds: 0,
+    timerRunning: false,
+    timerTotal: 0,
+  };
+  let timerInterval = null;
+  let alarmCheckInterval = null;
+  let audioCtx = null;
+
+  function todayKey(){
+    const d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  async function loadState(){
+    try{
+      const res = await window.storage.get('eaglemate-data');
+      if(res && res.value){
+        const parsed = JSON.parse(res.value);
+        state = Object.assign(state, parsed);
+      }
+    }catch(e){ /* no data yet */ }
+    render();
+  }
+
+  async function saveState(){
+    try{
+      await window.storage.set('eaglemate-data', JSON.stringify({
+        today: state.today, training: state.training, alarms: state.alarms, log: state.log
+      }));
+    }catch(e){ console.error('save failed', e); }
+  }
+
+  function playBeep(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      for(let i=0;i<3;i++){
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type='sine'; o.frequency.value = 880;
+        g.gain.value = 0.001;
+        o.connect(g); g.connect(audioCtx.destination);
+        const t = audioCtx.currentTime + i*0.35;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.25, t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t+0.3);
+        o.start(t); o.stop(t+0.32);
+      }
+    }catch(e){}
+  }
+
+  function showToast(msg){
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    root.appendChild(t);
+    requestAnimationFrame(()=>t.classList.add('show'));
+    setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 300); }, 2600);
+  }
+
+  function updateLogForToday(){
+    const list = [...state.today, ...state.training];
+    const done = list.filter(x=>x.done).length;
+    const total = list.length;
+    state.log[todayKey()] = { done, total };
+  }
+
+  function computeStreak(){
+    let streak = 0;
+    let d = new Date();
+    while(true){
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const entry = state.log[key];
+      if(entry && entry.total>0 && entry.done===entry.total){
+        streak++;
+        d.setDate(d.getDate()-1);
+      } else break;
+    }
+    return streak;
+  }
+
+  function completionPct(){
+    const list = [...state.today, ...state.training];
+    if(list.length===0) return 0;
+    return Math.round(100 * list.filter(x=>x.done).length / list.length);
+  }
+
+  function addTask(listName, text){
+    if(!text.trim()) return;
+    state[listName].push({ id: Date.now()+Math.random(), text: text.trim(), done:false });
+    updateLogForToday(); saveState(); render();
+  }
+  function toggleTask(listName, id){
+    const item = state[listName].find(x=>x.id===id);
+    if(item) item.done = !item.done;
+    updateLogForToday(); saveState(); render();
+  }
+  function delTask(listName, id){
+    state[listName] = state[listName].filter(x=>x.id!==id);
+    updateLogForToday(); saveState(); render();
+  }
+
+  function fmtTime(sec){
+    const m = Math.floor(sec/60), s = sec%60;
+    return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+
+  function startTimer(){
+    if(state.timerSeconds<=0) return;
+    state.timerRunning = true;
+    render();
+    timerInterval = setInterval(()=>{
+      state.timerSeconds--;
+      if(state.timerSeconds<=0){
+        clearInterval(timerInterval);
+        state.timerRunning = false;
+        playBeep();
+        showToast('Süre doldu! Harika iş çıkardın 💪');
+      }
+      render();
+    }, 1000);
+  }
+  function pauseTimer(){
+    state.timerRunning = false;
+    clearInterval(timerInterval);
+    render();
+  }
+  function resetTimer(){
+    clearInterval(timerInterval);
+    state.timerRunning = false;
+    state.timerSeconds = state.timerTotal;
+    render();
+  }
+  function setTimer(mins){
+    clearInterval(timerInterval);
+    state.timerRunning = false;
+    state.timerTotal = mins*60;
+    state.timerSeconds = mins*60;
+    render();
+  }
+
+  function addAlarm(time, label){
+    if(!time) return;
+    state.alarms.push({ id: Date.now()+Math.random(), time, label: label||'Hatırlatma', firedToday:false });
+    state.alarms.sort((a,b)=>a.time.localeCompare(b.time));
+    saveState(); render();
+  }
+  function delAlarm(id){
+    state.alarms = state.alarms.filter(a=>a.id!==id);
+    saveState(); render();
+  }
+  function checkAlarms(){
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const cur = hh+':'+mm;
+    state.alarms.forEach(a=>{
+      if(a.time===cur && !a.firedToday){
+        a.firedToday = true;
+        playBeep();
+        showToast('⏰ '+a.label);
+        if(window.Notification && Notification.permission==='granted'){
+          try{ new Notification('EagleMate', { body: a.label }); }catch(e){}
+        }
+      }
+      if(a.time !== cur) a.firedToday = false;
+    });
+  }
+
+  function render(){
+    const pct = completionPct();
+    const streak = computeStreak();
+    const r = 30, circ = 2*Math.PI*r;
+    const offset = circ - (pct/100)*circ;
+
+    root.innerHTML = `
+      <div class="wrap">
+        <div class="top">
+          <div class="ring-wrap">
+            <svg width="74" height="74">
+              <circle class="ring-bg" cx="37" cy="37" r="${r}"></circle>
+              <circle class="ring-fg" cx="37" cy="37" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"></circle>
+            </svg>
+            <div class="ring-label">%${pct}</div>
+          </div>
+          <div class="title-block">
+            <h1 class="display">EagleMate</h1>
+            <p>🔥 ${streak} günlük seri</p>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          ${tabBtn('today','Bugün')}
+          ${tabBtn('training','Antrenman')}
+          ${tabBtn('timer','Zamanlayıcı')}
+          ${tabBtn('progress','İlerleme')}
+        </div>
+
+        <div id="tab-content"></div>
+      </div>
+    `;
+
+    const content = document.getElementById('tab-content');
+    if(state.tab==='today') content.innerHTML = renderList('today','Günlük görevler', 'Yeni görev ekle...');
+    if(state.tab==='training') content.innerHTML = renderList('training','Antrenman listesi', 'Örn. 20 şınav...');
+    if(state.tab==='timer') content.innerHTML = renderTimer();
+    if(state.tab==='progress') content.innerHTML = renderProgress();
+
+    attachHandlers();
+  }
+
+  function tabBtn(key,label){
+    return `<div class="tab ${state.tab===key?'active':''}" data-tab="${key}" tabindex="0" role="tab">${label}</div>`;
+  }
+
+  function renderList(listName, title, placeholder){
+    const items = state[listName];
+    const rows = items.length ? items.map(it=>`
+      <div class="task">
+        <div class="check ${it.done?'done':''}" data-toggle="${listName}:${it.id}" tabindex="0">${it.done?'✓':''}</div>
+        <div class="task-text ${it.done?'done':''}">${escapeHtml(it.text)}</div>
+        <button class="del" data-del="${listName}:${it.id}" aria-label="Sil">✕</button>
+      </div>`).join('') : `<div class="empty">Henüz görev yok. Aşağıdan ekle.</div>`;
+
+    return `
+      <div class="card">
+        <h2>${title}</h2>
+        <div class="row">
+          <input type="text" id="input-${listName}" placeholder="${placeholder}" />
+          <button class="btn-add" data-add="${listName}">Ekle</button>
+        </div>
+        ${rows}
+      </div>
+    `;
+  }
+
+  function renderTimer(){
+    const alarmRows = state.alarms.length ? state.alarms.map(a=>`
+      <div class="alarm">
+        <div class="alarm-time">${a.time}</div>
+        <div class="alarm-label">${escapeHtml(a.label)}</div>
+        <button class="del" data-delalarm="${a.id}" aria-label="Sil">✕</button>
+      </div>`).join('') : `<div class="empty">Henüz hatırlatma yok.</div>`;
+
+    return `
+      <div class="card">
+        <h2>Zamanlayıcı</h2>
+        <div class="timer-display">${fmtTime(state.timerSeconds)}</div>
+        <div class="timer-btns">
+          ${state.timerRunning
+            ? `<button class="btn-pause" data-pause>Duraklat</button>`
+            : `<button class="btn-start" data-start>Başlat</button>`}
+          <button class="btn-reset" data-reset>Sıfırla</button>
+        </div>
+        <div class="quick-times">
+          <button class="qt" data-mins="5">5 dk</button>
+          <button class="qt" data-mins="10">10 dk</button>
+          <button class="qt" data-mins="20">20 dk</button>
+          <button class="qt" data-mins="25">25 dk</button>
+          <button class="qt" data-mins="45">45 dk</button>
+        </div>
+        <div class="badge-note">Zamanlayıcı bu sekme açıkken çalışır; sekme kapanırsa alarm sıfırlanır.</div>
+      </div>
+      <div class="card">
+        <h2>Günlük hatırlatmalar</h2>
+        <div class="row">
+          <input type="time" id="alarm-time" style="flex:0 0 120px;" />
+          <input type="text" id="alarm-label" placeholder="Ne için? (örn. Antrenman zamanı)" />
+          <button class="btn-add" data-addalarm>Ekle</button>
+        </div>
+        ${alarmRows}
+        <div class="badge-note" style="margin-top:10px;">Bildirimlerin sesli ve görsel çalması için bu sayfanın tarayıcıda açık kalması gerekir.</div>
+      </div>
+    `;
+  }
+
+  function renderProgress(){
+    const days = [];
+    for(let i=6;i>=0;i--){
+      const d = new Date();
+      d.setDate(d.getDate()-i);
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const entry = state.log[key] || {done:0,total:0};
+      const pct = entry.total>0 ? Math.round(100*entry.done/entry.total) : 0;
+      days.push({ label: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'][d.getDay()], pct });
+    }
+    const streak = computeStreak();
+    const totalDoneEver = Object.values(state.log).reduce((s,e)=>s+e.done,0);
+
+    return `
+      <div class="card">
+        <h2>Bu haftaki performans</h2>
+        <div class="stat-grid">
+          <div class="stat"><span class="num">${streak}</span><span class="lbl">Günlük seri 🔥</span></div>
+          <div class="stat"><span class="num">${totalDoneEver}</span><span class="lbl">Toplam tamamlanan görev</span></div>
+        </div>
+        <div class="bars">
+          ${days.map(d=>`
+            <div class="bar-col">
+              <div class="bar" style="height:70px;"><div class="bar-fill" style="height:${d.pct}%;"></div></div>
+              <div class="bar-day">${d.label}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="badge-note">İpucu: Bir günü %100 tamamlayınca seri artar. Seriyi bozmamak oyunun asıl hedefi!</div>
+    `;
+  }
+
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function attachHandlers(){
+    root.querySelectorAll('[data-tab]').forEach(el=>{
+      el.onclick = ()=>{ state.tab = el.dataset.tab; render(); };
+      el.onkeydown = (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); state.tab = el.dataset.tab; render(); } };
+    });
+    root.querySelectorAll('[data-add]').forEach(el=>{
+      const listName = el.dataset.add;
+      const input = document.getElementById('input-'+listName);
+      el.onclick = ()=>{ addTask(listName, input.value); };
+      if(input) input.onkeydown = (e)=>{ if(e.key==='Enter'){ addTask(listName, input.value); } };
+    });
+    root.querySelectorAll('[data-toggle]').forEach(el=>{
+      const [listName,id] = el.dataset.toggle.split(':');
+      const fire = ()=>toggleTask(listName, Number(id));
+      el.onclick = fire;
+      el.onkeydown = (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fire(); } };
+    });
+    root.querySelectorAll('[data-del]').forEach(el=>{
+      const [listName,id] = el.dataset.del.split(':');
+      el.onclick = ()=>delTask(listName, Number(id));
+    });
+    const startBtn = root.querySelector('[data-start]');
+    if(startBtn) startBtn.onclick = startTimer;
+    const pauseBtn = root.querySelector('[data-pause]');
+    if(pauseBtn) pauseBtn.onclick = pauseTimer;
+    const resetBtn = root.querySelector('[data-reset]');
+    if(resetBtn) resetBtn.onclick = resetTimer;
+    root.querySelectorAll('[data-mins]').forEach(el=>{
+      el.onclick = ()=>setTimer(Number(el.dataset.mins));
+    });
+    const addAlarmBtn = root.querySelector('[data-addalarm]');
+    if(addAlarmBtn) addAlarmBtn.onclick = ()=>{
+      const t = document.getElementById('alarm-time').value;
+      const l = document.getElementById('alarm-label').value;
+      addAlarm(t,l);
+    };
+    root.querySelectorAll('[data-delalarm]').forEach(el=>{
+      el.onclick = ()=>delAlarm(Number(el.dataset.delalarm));
+    });
+  }
+
+  if(window.Notification && Notification.permission==='default'){
+    try{ Notification.requestPermission(); }catch(e){}
+  }
+
+  loadState();
+  alarmCheckInterval = setInterval(checkAlarms, 1000*15);
+})();
+</script>

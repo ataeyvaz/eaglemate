@@ -1,0 +1,11 @@
+{
+  "appId": "com.eaglemate.app",
+  "appName": "EagleMate",
+  "webDir": "dist",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#22D3EE"
+    }
+  }
+}

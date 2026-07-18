@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+dist-ssr/
+
+# capacitor native platforms (cap add ile üretilir)
+android/
+ios/
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / os
+.DS_Store
+.vscode/
+*.local
+
+# env
+.env
+.env.*
