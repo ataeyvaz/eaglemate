@@ -591,6 +591,51 @@ button {
   line-height: 1.45;
 }
 
+/* egzersiz kütüphanesi (tüm hareketler) */
+.lib-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--line);
+}
+.lib-item:last-child {
+  border-bottom: none;
+}
+.lib-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 8px 0 2px;
+}
+.lib-level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lib-level-badge {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--cyan);
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lib-level-text {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.lib-level-text b {
+  color: var(--cyan);
+}
+
 /* seviye kontrolü */
 .level-ctl {
   display: flex;

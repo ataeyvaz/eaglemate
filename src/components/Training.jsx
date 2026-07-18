@@ -4,8 +4,10 @@ import {
   generateSession,
   completedTrainingDaysSince,
   LEVEL_UP_SESSIONS,
+  TOTAL_MOVE_COUNT,
 } from '../data/program'
 import ExerciseFigure from './ExerciseFigure'
+import ExerciseLibrary from './ExerciseLibrary'
 
 // Tek egzersiz satırı: şekil + işaretleme + "nasıl yapılır?" açılır tarifi.
 function ExerciseItem({ item, checked, onToggle }) {
@@ -56,9 +58,14 @@ function ExerciseItem({ item, checked, onToggle }) {
 // Antrenman sekmesi: o günün programını üretir, öğeleri işaretletir, seviye
 // ilerlemesini yönetir.
 export default function Training({ program, sessions, onToggleItem, onSetLevel }) {
+  const [view, setView] = useState('session') // session | library
   const dk = todayKey()
   const session = useMemo(() => generateSession(dk, program.level), [dk, program.level])
   const checked = sessions?.[dk]?.checked || {}
+
+  if (view === 'library') {
+    return <ExerciseLibrary onExit={() => setView('session')} />
+  }
 
   const doneCount = session.countableIds.filter((id) => checked[id]).length
   const total = session.countableIds.length
@@ -126,6 +133,16 @@ export default function Training({ program, sessions, onToggleItem, onSetLevel }
           ))}
         </div>
       ))}
+
+      {/* Tüm hareketler kütüphanesi */}
+      <div className="card">
+        <button className="mode-btn ghost" onClick={() => setView('library')}>
+          📚 Tüm hareketler ({TOTAL_MOVE_COUNT})
+          <span className="mode-sub">
+            Günlük seans bunlardan seçilir — hepsini seviye ve tarifleriyle gör
+          </span>
+        </button>
+      </div>
 
       {/* Program bilgi / seviye kontrolü */}
       <div className="card">

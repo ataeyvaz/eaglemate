@@ -610,3 +610,70 @@ export function completedTrainingDaysSince(sessions, sinceKey) {
   }
   return count
 }
+
+// ---- Egzersiz kütüphanesi (tüm hareketleri kategoriye göre gözden geçirme) ----
+// Antrenman sekmesi yalnızca o günün seansını gösterir; bu ise TÜM hareketleri
+// (figür + 4 seviye + adım adım tarif) kategorilere ayırıp listeler.
+const LIBRARY_GROUPS = [
+  ['Bacak', POOLS.legs],
+  ['İtiş (üst vücut)', POOLS.push],
+  ['Sırt & Kalça', POOLS.posterior],
+  ['Merkez (Core)', POOLS.core],
+  ['Futbol & Çeviklik', POOLS.agility],
+  ['Gölge Boksu', POOLS.strikes],
+]
+
+// Bir hareketi (tüm seviyeleriyle) kütüphane öğesine çevirir.
+function libraryMove(key) {
+  const mv = MOVES[key]
+  return {
+    key,
+    name: mv.name,
+    pattern: mv.pattern,
+    caution: mv.caution || null,
+    steps: mv.steps || null,
+    illo: mv.illo || null,
+    variants: [1, 2, 3, 4].map((lv) => ({
+      level: lv,
+      label: mv.levels[lv].label,
+      detail: mv.levels[lv].detail,
+      rest: mv.levels[lv].rest,
+    })),
+  }
+}
+
+function libraryFixed(item) {
+  return {
+    key: item.key,
+    name: item.name,
+    detail: item.detail,
+    note: item.note || null,
+    steps: item.steps || null,
+    illo: item.illo || null,
+    variants: null,
+  }
+}
+
+// Kütüphaneyi bölümler halinde döndürür. MOVES'ta olup gruplara girmeyen
+// hareketler (stance, footwork, shadowround, balance...) "Boks & Diğer"e düşer.
+export function getLibrary() {
+  const sections = []
+  sections.push({ title: 'Isınma', items: WARMUP.map(libraryFixed) })
+
+  const used = new Set()
+  for (const [title, keys] of LIBRARY_GROUPS) {
+    sections.push({ title, items: keys.map(libraryMove) })
+    keys.forEach((k) => used.add(k))
+  }
+
+  const rest = Object.keys(MOVES).filter((k) => !used.has(k))
+  if (rest.length) {
+    sections.push({ title: 'Boks & Diğer', items: rest.map(libraryMove) })
+  }
+
+  sections.push({ title: 'Soğuma', items: COOLDOWN.map(libraryFixed) })
+  return sections
+}
+
+// Kütüphanedeki toplam hareket sayısı (ısınma/soğuma hariç ana hareketler).
+export const TOTAL_MOVE_COUNT = Object.keys(MOVES).length
