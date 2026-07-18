@@ -6,6 +6,19 @@
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon",
       "iconColor": "#22D3EE"
+    },
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#0B1120",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": false,
+      "splashImmersive": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0B1120"
     }
   }
 }

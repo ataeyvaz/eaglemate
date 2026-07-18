@@ -11,6 +11,7 @@ import Toast from './components/Toast'
 import { useEagleState, completionPct, computeStreak } from './hooks/useEagleState'
 import { useTimer } from './hooks/useTimer'
 import { notifications } from './lib/notifications'
+import { initNativeUi } from './lib/nativeUi'
 import { playBeep } from './lib/sound'
 
 export default function App() {
@@ -46,9 +47,10 @@ export default function App() {
     showToast('Süre doldu! Harika iş çıkardın 💪')
   })
 
-  // Açılışta bildirim izni iste
+  // Açılışta bildirim izni iste + native arayüz cilası (durum çubuğu, splash)
   useEffect(() => {
     notifications.requestPermission().catch(() => {})
+    initNativeUi().catch(() => {})
   }, [])
 
   // Native tarafta alarmları uygulama açılışında native zamanlayıcıyla senkronla

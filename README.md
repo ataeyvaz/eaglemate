@@ -175,7 +175,24 @@ Antrenman sekmesinde **Hazır program** (rotasyonlu) / **Kendim seçerim** geçi
 Kartal tüm hareketleri görüp `+`/`✓` ile kendi seansını kurar; ısınma+soğuma her zaman
 otomatik eklenir. Seçim kalıcı; tamamlama/streak'e hazır seans gibi sayılır.
 
-## Sonraki fazlar
+### Faz 7 — Cilalama ve kurulum
 
-Faz 1–5 tamamlandı. Sıradaki: Faz 6 (opsiyonel ebeveyn takip paneli / senkron),
-Faz 7 (cilalama).
+- **Uygulama ikonu**: cyan-teal gradyanlı kartal amblemi, koyu zeminde (adaptive +
+  legacy + yuvarlak). Kaynak `assets/`'te, `scripts/make-assets.mjs` (SVG→PNG, sharp).
+- **Açılış ekranı (splash)**: koyu zemin + kartal (`@capacitor/splash-screen`).
+- **Durum çubuğu**: koyu tema, açık içerik (`@capacitor/status-bar`, `src/lib/nativeUi.js`).
+- **İsim**: EagleMate.
+
+**İkon/splash yeniden üretmek için:**
+```bash
+node scripts/make-assets.mjs            # assets/*.png üret
+npx @capacitor/assets generate --android # android/ içine dağıt (gitignore'da)
+```
+
+Faz 6 (ebeveyn takip paneli / Supabase senkron) tek cihaz kullanımı için atlandı.
+
+## Kurulum (özet)
+
+`EagleMate-debug.apk`'yı telefona indir → aç → "bilinmeyen kaynak"a izin ver → kur.
+Aile içi tek-cihaz kullanım; mağaza/imza gerekmez. İlk açılışta bildirim (ve dikte/
+kitap için mikrofon) izni ister.
