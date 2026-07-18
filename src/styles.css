@@ -95,13 +95,18 @@ body {
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.tabs::-webkit-scrollbar {
+  display: none; /* Chrome/WebView */
 }
 .tab {
-  flex: 1;
+  flex: 1 0 auto;
   text-align: center;
-  padding: 9px 2px;
+  padding: 9px 12px;
   border-radius: 9px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
@@ -749,4 +754,93 @@ button {
   font-size: 13px;
   font-family: 'Consolas', monospace;
   resize: vertical;
+}
+
+/* ---- Kitap günlüğü (Faz 4) ---- */
+.book-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 2px;
+  color: var(--text);
+  font-weight: 400;
+}
+.book-row:last-child {
+  border-bottom: none;
+}
+.book-body {
+  flex: 1;
+  min-width: 0;
+}
+.book-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+.book-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.book-arrow {
+  color: var(--muted);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.rec-timer {
+  font-family: 'Oswald', sans-serif;
+  font-size: 40px;
+  text-align: center;
+  color: #fff;
+  margin: 6px 0 12px;
+}
+
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--line);
+}
+.rec-row:last-child {
+  border-bottom: none;
+}
+.rec-play {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: #03222b;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rec-play.playing {
+  background: var(--amber);
+  color: #2b1e00;
+}
+.rec-play:disabled {
+  opacity: 0.5;
+}
+.rec-body {
+  flex: 1;
+  min-width: 0;
+}
+.rec-meta {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 600;
+}
+.rec-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
 }

@@ -4,6 +4,7 @@ import Tabs from './components/Tabs'
 import TaskList from './components/TaskList'
 import Training from './components/Training'
 import Language from './components/Language'
+import Books from './components/Books'
 import TimerTab from './components/TimerTab'
 import Progress from './components/Progress'
 import Toast from './components/Toast'
@@ -25,6 +26,11 @@ export default function App() {
     rateCard,
     importDeck,
     loadReadyDeck,
+    addBook,
+    updateBookProgress,
+    delBook,
+    addRecording,
+    delRecording,
     addAlarm,
     delAlarm,
   } = useEagleState()
@@ -119,6 +125,18 @@ export default function App() {
           onRate={rateCard}
           onImport={importDeck}
           onLoadReady={loadReadyDeck}
+        />
+      )}
+
+      {tab === 'books' && (
+        <Books
+          books={data.books}
+          recordings={data.recordings}
+          onAddBook={addBook}
+          onUpdateProgress={updateBookProgress}
+          onDelBook={delBook}
+          onAddRecording={addRecording}
+          onDelRecording={delRecording}
         />
       )}
 

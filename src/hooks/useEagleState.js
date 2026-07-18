@@ -6,6 +6,7 @@ import { sessionCountableIds } from '../data/program'
 import { SEED_DECKS, normalizeCard } from '../data/languages'
 import { schedule } from '../data/srs'
 import { READY_DECKS } from '../data/readyDecks'
+import { audioStore } from '../lib/audioStore'
 
 const STORAGE_KEY = 'eaglemate-data'
 
@@ -20,6 +21,8 @@ const emptyData = {
     decks: SEED_DECKS, //  { en: [...], de: [...], es: [...] }
     srs: {}, //           { cardId: { stage, due, lastResult } }
   },
+  books: [], //       { id, title, author, progress, createdAt }
+  recordings: [], //  { id, bookId, date, durationMs, mimeType, audioRef, note }
 }
 
 // Bir günün toplam tamamlanma sayısını (serbest görevler + o günün antrenman
@@ -98,6 +101,8 @@ export function useEagleState() {
             sessions: data.sessions,
             program: data.program,
             lang: data.lang,
+            books: data.books,
+            recordings: data.recordings,
           })
         )
         .catch((e) => console.error('kaydetme hatası', e))
@@ -240,6 +245,63 @@ export function useEagleState() {
     return ready.length
   }, [])
 
+  // ---- Kitap günlüğü aksiyonları ----
+  const addBook = useCallback((title, author, progress) => {
+    const t = (title || '').trim()
+    if (!t) return
+    const book = {
+      id: Date.now() + Math.random(),
+      title: t,
+      author: (author || '').trim(),
+      progress: (progress || '').trim(),
+      createdAt: todayKey(),
+    }
+    setData((prev) => ({ ...prev, books: [book, ...prev.books] }))
+  }, [])
+
+  const updateBookProgress = useCallback((id, progress) => {
+    setData((prev) => ({
+      ...prev,
+      books: prev.books.map((b) => (b.id === id ? { ...b, progress } : b)),
+    }))
+  }, [])
+
+  const delBook = useCallback((id) => {
+    setData((prev) => {
+      // kitabın kayıtlarının ses dosyalarını da sil
+      prev.recordings
+        .filter((r) => r.bookId === id)
+        .forEach((r) => audioStore.remove(r.audioRef).catch(() => {}))
+      return {
+        ...prev,
+        books: prev.books.filter((b) => b.id !== id),
+        recordings: prev.recordings.filter((r) => r.bookId !== id),
+      }
+    })
+  }, [])
+
+  // Ses dosyası zaten audioStore ile kaydedilip audioRef alınmış olarak gelir.
+  const addRecording = useCallback((bookId, { audioRef, durationMs, mimeType, note }) => {
+    const rec = {
+      id: Date.now() + Math.random(),
+      bookId,
+      date: todayKey(),
+      durationMs: durationMs || 0,
+      mimeType: mimeType || '',
+      audioRef,
+      note: (note || '').trim(),
+    }
+    setData((prev) => ({ ...prev, recordings: [rec, ...prev.recordings] }))
+  }, [])
+
+  const delRecording = useCallback((id) => {
+    setData((prev) => {
+      const rec = prev.recordings.find((r) => r.id === id)
+      if (rec) audioStore.remove(rec.audioRef).catch(() => {})
+      return { ...prev, recordings: prev.recordings.filter((r) => r.id !== id) }
+    })
+  }, [])
+
   // ---- Alarm aksiyonları ----
   const addAlarm = useCallback((time, label) => {
     if (!time) return
@@ -274,6 +336,11 @@ export function useEagleState() {
     rateCard,
     importDeck,
     loadReadyDeck,
+    addBook,
+    updateBookProgress,
+    delBook,
+    addRecording,
+    delRecording,
     addAlarm,
     delAlarm,
   }

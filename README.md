@@ -3,10 +3,10 @@
 Günlük görev, antrenman, zamanlayıcı ve **gerçek arka plan alarmı** olan mobil uygulama.
 Yol haritası için bkz. [`eaglemate-yol-haritasi.md`](./eaglemate-yol-haritasi.md).
 
-Bu depo **Faz 1 (MVP)** + **Faz 2 (Antrenman program mantığı)** + **Faz 3 (Dil modülü)**
-çıktısıdır: `eaglemate.html` prototipi React + Vite + Capacitor tabanlı, telefona
-kurulabilen bir uygulamaya taşınmış; antrenman sekmesi gerçek bir program motoruna
-dönüştürülmüş; dikte + aralıklı tekrar tabanlı bir dil öğrenme modülü eklenmiştir.
+Bu depo **Faz 1–4** çıktısıdır: `eaglemate.html` prototipi React + Vite + Capacitor
+tabanlı, telefona kurulabilen bir uygulamaya taşınmış; antrenman sekmesi gerçek bir
+program motoruna dönüştürülmüş; dikte + aralıklı tekrar tabanlı bir dil öğrenme modülü
+ve sesli kayıtlı bir kitap günlüğü eklenmiştir.
 
 ### Faz 2 — Antrenman programı
 
@@ -50,6 +50,21 @@ Diller: **İngilizce, Almanca, İspanyolca** (dil seçici; her dilin ayrı deste
 > **Android WebView notu:** Capacitor eklentileri **statik** import edilir (dinamik
 > `import()` bazı WebView'larda açılışta takılıp "Yükleniyor…" ekranında donmaya yol
 > açıyordu). Ayrıca ilk yüklemede 4 sn'lik güvence zamanlayıcısı var.
+
+### Faz 4 — Kitap günlüğü
+
+- **Kitap ekleme**: ad, yazar, ilerleme (sayfa/bölüm). İlerleme sonradan güncellenebilir.
+- **Günlük sesli özet**: "Bugün ne okudun?" — `capacitor-voice-recorder` ile ses kaydı
+  (`src/lib/recorder.js`), isteğe bağlı kısa metin notu.
+- **Depolama** (`src/lib/audioStore.js`): native'de ses dosyaları Filesystem (Data
+  dizini) altında tutulur, state'te yalnızca dosya yolu; oynatma `convertFileSrc` ile.
+  Web'de base64 data URL. Kitap silinince kayıtları ve ses dosyaları da temizlenir.
+- **Kayıtlar** kitaba göre gruplanır, tarih + süre ile listelenir, oynatılır/silinir.
+- Otomatik transkript (kayıttan metin çıkarma) şimdilik yok (cihaz üstü dosya-transkripti
+  yok); yerine isteğe bağlı manuel not alanı var. İleride bulut STT ile eklenebilir.
+
+> Sekme sayısı artınca (6 sekme) üst sekme çubuğu **yatay kaydırılabilir** yapıldı;
+> aktif sekme otomatik ortaya kaydırılır.
 
 ## Teknoloji
 
@@ -110,6 +125,9 @@ src/
     Dictation.jsx       # Dikte: konuşma tanıma + karşılaştırma (Faz 3)
     Quiz.jsx            # Çoktan seçmeli mini quiz (Faz 3)
     ImportDeck.jsx      # JSON kart içe aktarma (Faz 3)
+    Books.jsx           # Kitap günlüğü: liste + detay (Faz 4)
+    BookRecorder.jsx    # "Bugün ne okudun?" sesli kayıt kartı (Faz 4)
+    RecordingRow.jsx    # Kayıt satırı: oynat/sil (Faz 4)
     TimerTab.jsx        # Zamanlayıcı + günlük hatırlatmalar
     Progress.jsx        # 7 günlük performans grafiği
     Toast.jsx
@@ -125,11 +143,13 @@ src/
     notifications.js    # LocalNotifications ⇄ Web Notification soyutlaması
     speech.js           # konuşma tanıma soyutlaması (native plugin ⇄ Web Speech) (Faz 3)
     compare.js          # dikte metin karşılaştırma (Faz 3)
+    recorder.js         # sesli kayıt soyutlaması (Faz 4)
+    audioStore.js       # ses dosyası kalıcılaştırma: Filesystem ⇄ data URL (Faz 4)
     date.js             # tarih/gün anahtarı yardımcıları
     sound.js            # zamanlayıcı bip sesi
 ```
 
 ## Sonraki fazlar
 
-Faz 1, 2 ve 3 tamamlandı. Sıradaki: Faz 4 (kitap günlüğü), Faz 5 (native alarm inceliği),
-Faz 6 (opsiyonel ebeveyn takip paneli), Faz 7 (cilalama).
+Faz 1–4 tamamlandı. Sıradaki: Faz 5 (native alarm inceliği), Faz 6 (opsiyonel ebeveyn
+takip paneli), Faz 7 (cilalama).
