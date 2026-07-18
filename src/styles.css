@@ -635,6 +635,54 @@ button {
 .lib-level-text b {
   color: var(--cyan);
 }
+.lib-item.picked {
+  background: rgba(52, 211, 153, 0.07);
+  border-radius: 10px;
+}
+.lib-pick {
+  flex-shrink: 0;
+  align-self: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--cyan);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lib-pick.on {
+  background: var(--green);
+  border-color: var(--green);
+  color: #04241a;
+}
+
+/* mod seçimi (hazır / kendim seçerim) */
+.mode-switch {
+  display: flex;
+  gap: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+}
+.mode-tab {
+  flex: 1;
+  padding: 9px 6px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+}
+.mode-tab.active {
+  background: var(--cyan);
+  color: #03222b;
+}
 
 /* seviye kontrolü */
 .level-ctl {
@@ -969,4 +1017,51 @@ button {
   font-size: 13px;
   color: var(--muted);
   margin-top: 2px;
+}
+
+/* ---- Bildirim/alarm ayarları (Faz 5) ---- */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.setting-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 600;
+}
+.setting-hint {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.status-badge {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.status-badge.ok {
+  background: rgba(52, 211, 153, 0.18);
+  color: var(--green);
+}
+.status-badge.bad {
+  background: rgba(248, 113, 113, 0.16);
+  color: var(--red);
+}
+.status-badge.warn {
+  background: rgba(251, 191, 36, 0.16);
+  color: var(--amber);
+}
+.status-badge.muted {
+  background: var(--panel-2);
+  color: var(--muted);
 }

@@ -3,10 +3,12 @@ import { getLibrary, TOTAL_MOVE_COUNT } from '../data/program'
 import ExerciseFigure from './ExerciseFigure'
 
 // Tek kütüphane kartı: figür + isim + (varsa) 4 seviye + açılır tarif.
-function LibraryItem({ item }) {
+// selectable ise sağda seç/kaldır (+ / ✓) düğmesi gösterir.
+function LibraryItem({ item, selectable, selected, onToggleSelect }) {
   const [open, setOpen] = useState(false)
+  const canSelect = selectable && item.variants // yalnızca ana hareketler seçilebilir
   return (
-    <div className="lib-item">
+    <div className={`lib-item ${selected ? 'picked' : ''}`}>
       {item.illo && (
         <div className="ex-figure-wrap">
           <ExerciseFigure pose={item.illo} />
@@ -44,28 +46,47 @@ function LibraryItem({ item }) {
           </ol>
         )}
       </div>
+
+      {canSelect && (
+        <button
+          className={`lib-pick ${selected ? 'on' : ''}`}
+          aria-label={selected ? 'Listeden çıkar' : 'Listeye ekle'}
+          onClick={() => onToggleSelect(item.key)}
+        >
+          {selected ? '✓' : '+'}
+        </button>
+      )}
     </div>
   )
 }
 
-// Tüm egzersizleri kategoriye göre listeleyen ekran.
-export default function ExerciseLibrary({ onExit }) {
+// Tüm egzersizleri kategoriye göre listeler. selectable ise seçim modunda çalışır.
+export default function ExerciseLibrary({
+  onExit,
+  selectable = false,
+  selectedKeys = [],
+  onToggleSelect,
+}) {
   const sections = useMemo(() => getLibrary(), [])
+  const selectedSet = useMemo(() => new Set(selectedKeys), [selectedKeys])
 
   return (
     <>
       <div className="dict-topbar">
         <button className="link-btn" onClick={onExit}>
-          ← Antrenman
+          {selectable ? '✓ Bitti' : '← Antrenman'}
         </button>
-        <span className="session-sub">{TOTAL_MOVE_COUNT} hareket</span>
+        <span className="session-sub">
+          {selectable ? `${selectedSet.size} seçili` : `${TOTAL_MOVE_COUNT} hareket`}
+        </span>
       </div>
 
       <div className="card">
-        <h2>Tüm hareketler</h2>
+        <h2>{selectable ? 'Hareket seç' : 'Tüm hareketler'}</h2>
         <p className="session-sub">
-          Günlük seans bu havuzdan rotasyonla seçilir; burada hepsini seviyeleri ve
-          tarifleriyle görebilirsin.
+          {selectable
+            ? 'Yapmak istediklerini + ile ekle. Dengeli olması için en az bir bacak, bir üst vücut ve bir core hareketi seçmeni öneririm. Isınma ve soğuma her zaman eklenir.'
+            : 'Günlük seans bu havuzdan rotasyonla seçilir; burada hepsini seviyeleri ve tarifleriyle görebilirsin.'}
         </p>
       </div>
 
@@ -73,7 +94,13 @@ export default function ExerciseLibrary({ onExit }) {
         <div className="card" key={sec.title}>
           <h2>{sec.title}</h2>
           {sec.items.map((it) => (
-            <LibraryItem key={it.key} item={it} />
+            <LibraryItem
+              key={it.key}
+              item={it}
+              selectable={selectable}
+              selected={selectedSet.has(it.key)}
+              onToggleSelect={onToggleSelect}
+            />
           ))}
         </div>
       ))}

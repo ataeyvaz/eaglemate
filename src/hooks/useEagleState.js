@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { storage } from '../lib/storage'
 import { notifications } from '../lib/notifications'
 import { dayKey, todayKey } from '../lib/date'
-import { sessionCountableIds } from '../data/program'
+import { sessionCountableIds, customCountableIds } from '../data/program'
 import { SEED_DECKS, normalizeCard } from '../data/languages'
 import { schedule } from '../data/srs'
 import { READY_DECKS } from '../data/readyDecks'
@@ -15,7 +15,9 @@ const emptyData = {
   alarms: [],
   log: {}, //      { 'YYYY-MM-DD': { done, total } }
   sessions: {}, // { 'YYYY-MM-DD': { checked: { itemId: true }, full: bool } }
-  program: { level: 1, levelSince: '2000-01-01' }, // antrenman ilerlemesi
+  // antrenman ilerlemesi. mode: 'auto' (rotasyonlu hazır program) | 'custom'
+  // (Kartal kendi hareketlerini seçer). customKeys: seçilen hareket anahtarları.
+  program: { level: 1, levelSince: '2000-01-01', mode: 'auto', customKeys: [] },
   lang: {
     activeLang: 'en',
     decks: SEED_DECKS, //  { en: [...], de: [...], es: [...] }
@@ -29,7 +31,10 @@ const emptyData = {
 // seansı) hesaplar. Streak ve halka yüzdesi buradan beslenir.
 function dayCounts(data, dateKey = todayKey()) {
   const level = data.program?.level || 1
-  const ids = sessionCountableIds(dateKey, level)
+  const ids =
+    data.program?.mode === 'custom'
+      ? customCountableIds(dateKey, level, data.program.customKeys)
+      : sessionCountableIds(dateKey, level)
   const checked = data.sessions?.[dateKey]?.checked || {}
   const sessionDone = ids.filter((id) => checked[id]).length
   const todayDone = data.today.filter((x) => x.done).length
@@ -183,8 +188,31 @@ export function useEagleState() {
     const clamped = Math.max(1, Math.min(4, level))
     setData((prev) => ({
       ...prev,
-      program: { level: clamped, levelSince: todayKey() },
+      program: { ...prev.program, level: clamped, levelSince: todayKey() },
     }))
+  }, [])
+
+  // Program modunu değiştirir: 'auto' (hazır) | 'custom' (Kartal seçer).
+  // Günün toplamı değişeceği için log yeniden hesaplanır.
+  const setProgramMode = useCallback((mode) => {
+    setData((prev) => {
+      const next = { ...prev, program: { ...prev.program, mode } }
+      const { done, total } = dayCounts(next)
+      return { ...next, log: { ...next.log, [todayKey()]: { done, total } } }
+    })
+  }, [])
+
+  // Kendi seçim modunda bir hareketi listeye ekler/çıkarır.
+  const toggleCustomExercise = useCallback((key) => {
+    setData((prev) => {
+      const cur = prev.program.customKeys || []
+      const customKeys = cur.includes(key)
+        ? cur.filter((k) => k !== key)
+        : [...cur, key]
+      const next = { ...prev, program: { ...prev.program, customKeys } }
+      const { done, total } = dayCounts(next)
+      return { ...next, log: { ...next.log, [todayKey()]: { done, total } } }
+    })
   }, [])
 
   // ---- Dil modülü aksiyonları ----
@@ -332,6 +360,8 @@ export function useEagleState() {
     delTask,
     toggleSessionItem,
     setLevel,
+    setProgramMode,
+    toggleCustomExercise,
     setActiveLang,
     rateCard,
     importDeck,

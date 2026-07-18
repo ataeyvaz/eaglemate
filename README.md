@@ -103,11 +103,20 @@ npm run open:android   # Android Studio açılır
 npm run open:ios       # Xcode açılır (Mac)
 ```
 
-### Android alarm izni notu (Faz 5'te detaylandırılacak)
+### Android alarm izinleri (Faz 5)
 
-Android 12+ üzerinde tam zamanlı alarmların telefon uykudayken tetiklenmesi için
-`SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM` izinleri gerekebilir. Şu an bildirimler
-`allowWhileIdle` ile planlanıyor; ince ayar Faz 5'te yapılacak.
+Tam zamanlı alarmların (telefon uykuda/uygulama kapalı olsa bile tam dakikada
+çalması) için `android/app/src/main/AndroidManifest.xml`'e şu izinler **elle** eklendi:
+
+```xml
+<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+```
+
+`android/` klasörü `.gitignore`'da olduğu için bu manifest dosyası git'e ayrıca
+(`git add -f`) eklenmiştir — `cap add android` ile yeniden üretilirse bu iki satır
+geri eklenmelidir. Bildirimler ayrıca `allowWhileIdle` ile planlanır. Uygulama içinde
+**Sayaç** sekmesinde izin durumu, tam-zamanlı alarm ayarı ve "test bildirimi" bulunur.
 
 ## Proje yapısı
 
@@ -149,7 +158,24 @@ src/
     sound.js            # zamanlayıcı bip sesi
 ```
 
+### Faz 5 — Bildirim/alarm native inceliği
+
+- **Tam-zamanlı alarm izinleri** manifeste eklendi (yukarıya bakın).
+- **Durum teşhisi** (`src/components/NotificationSettings.jsx`, Sayaç sekmesinde): bildirim
+  izni ve tam-zamanlı alarm durumu rozetlerle gösterilir; kapalıysa "İzin ver" /
+  "Ayarları aç" düğmeleri (`checkExactNotificationSetting` / `changeExactNotificationSetting`).
+- **Test bildirimi**: 8 sn sonra tetiklenen bildirim — uygulamayı kapatıp arka planda
+  geldiğini doğrulamak için (`notifications.sendTest`).
+- Alarmlar açılışta yeniden senkronlanır; `RECEIVE_BOOT_COMPLETED` ile yeniden başlatma
+  sonrası da kurulur.
+
+### Antrenman — "Kendim seçerim" modu
+
+Antrenman sekmesinde **Hazır program** (rotasyonlu) / **Kendim seçerim** geçişi. İkincisinde
+Kartal tüm hareketleri görüp `+`/`✓` ile kendi seansını kurar; ısınma+soğuma her zaman
+otomatik eklenir. Seçim kalıcı; tamamlama/streak'e hazır seans gibi sayılır.
+
 ## Sonraki fazlar
 
-Faz 1–4 tamamlandı. Sıradaki: Faz 5 (native alarm inceliği), Faz 6 (opsiyonel ebeveyn
-takip paneli), Faz 7 (cilalama).
+Faz 1–5 tamamlandı. Sıradaki: Faz 6 (opsiyonel ebeveyn takip paneli / senkron),
+Faz 7 (cilalama).

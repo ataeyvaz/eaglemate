@@ -86,6 +86,67 @@ export const notifications = {
     }
   },
 
+  // ---- Faz 5: durum teşhisi + tam-zamanlı alarm + test ----
+
+  // Bildirim ve tam-zamanlı alarm durumunu döndürür.
+  // display: 'granted'|'denied'|'prompt'... , exact: 'granted'|'denied'|'unsupported'
+  async checkStatus() {
+    const ln = await getLN()
+    if (ln) {
+      let display = 'prompt'
+      let exact = 'unsupported'
+      try {
+        const p = await ln.checkPermissions()
+        display = p.display
+      } catch {
+        /* yoksay */
+      }
+      try {
+        const e = await ln.checkExactNotificationSetting()
+        exact = e.exact_alarm // Android 12+; diğerlerinde granted/unsupported döner
+      } catch {
+        exact = 'unsupported'
+      }
+      return { platform: 'native', display, exact }
+    }
+    const webPerm =
+      typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+    return { platform: 'web', display: webPerm, exact: 'unsupported' }
+  },
+
+  // Android tam-zamanlı alarm ayar ekranını açar (kullanıcı elle izin verir).
+  async openExactAlarmSettings() {
+    const ln = await getLN()
+    if (!ln) return
+    try {
+      await ln.changeExactNotificationSetting()
+    } catch {
+      /* yoksay */
+    }
+  },
+
+  // Test bildirimi: birkaç saniye sonra tetiklenir; kullanıcı bu sırada
+  // uygulamayı kapatıp arka planda geldiğini görebilir.
+  async sendTest(secondsFromNow = 8) {
+    const ln = await getLN()
+    if (ln) {
+      const at = new Date(Date.now() + secondsFromNow * 1000)
+      await ln.schedule({
+        notifications: [
+          {
+            id: 999999,
+            title: 'EagleMate testi',
+            body: `Test bildirimi — ${secondsFromNow} sn sonra geldi ✓`,
+            schedule: { at, allowWhileIdle: true },
+          },
+        ],
+      })
+      return true
+    }
+    this.fireWebNotification('Test bildirimi ✓ (web — yalnızca sayfa açıkken)')
+    return typeof Notification !== 'undefined' && Notification.permission === 'granted'
+  },
+
   // Web fallback: sayfa açıkken anlık bildirim.
   fireWebNotification(label) {
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {

@@ -597,6 +597,31 @@ export function sessionCountableIds(dateKey, level) {
   return generateSession(dateKey, level).countableIds
 }
 
+// Kartal'ın kendi seçtiği hareketlerden seansı üretir (ısınma + seçim + soğuma).
+export function buildCustomSession(dateKey, level, customKeys) {
+  const moves = (customKeys || []).filter((k) => MOVES[k])
+  const blocks = [
+    { title: 'Isınma', items: WARMUP.map((i) => fixedItem(dateKey, i)) },
+    { title: 'Kartal’ın Seçimi', items: moves.map((k) => moveItem(dateKey, k, level)) },
+    { title: 'Soğuma', items: COOLDOWN.map((i) => fixedItem(dateKey, i)) },
+  ]
+  const countableIds = blocks.flatMap((b) => b.items.map((i) => i.id))
+  return {
+    type: 'custom',
+    title: 'Kendi Programın',
+    est: `${moves.length} hareket`,
+    isTraining: true,
+    moveCount: moves.length,
+    blocks,
+    countableIds,
+  }
+}
+
+// Kendi seçim modundaki sayılabilir id'ler (log/streak için).
+export function customCountableIds(dateKey, level, customKeys) {
+  return buildCustomSession(dateKey, level, customKeys).countableIds
+}
+
 // Seviye atlama eşiği: mevcut seviyede bu kadar TAM tamamlanmış antrenman günü.
 export const LEVEL_UP_SESSIONS = 6
 

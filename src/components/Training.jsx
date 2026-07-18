@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { todayKey } from '../lib/date'
 import {
   generateSession,
+  buildCustomSession,
   completedTrainingDaysSince,
   LEVEL_UP_SESSIONS,
   TOTAL_MOVE_COUNT,
@@ -55,16 +56,42 @@ function ExerciseItem({ item, checked, onToggle }) {
   )
 }
 
-// Antrenman sekmesi: o günün programını üretir, öğeleri işaretletir, seviye
-// ilerlemesini yönetir.
-export default function Training({ program, sessions, onToggleItem, onSetLevel }) {
-  const [view, setView] = useState('session') // session | library
+// Antrenman sekmesi: hazır (rotasyonlu) veya Kartal'ın kendi seçtiği program.
+export default function Training({
+  program,
+  sessions,
+  onToggleItem,
+  onSetLevel,
+  onSetMode,
+  onToggleExercise,
+}) {
+  const [view, setView] = useState('session') // session | library | picker
   const dk = todayKey()
-  const session = useMemo(() => generateSession(dk, program.level), [dk, program.level])
+  const isCustom = program.mode === 'custom'
+  const customKeys = program.customKeys || []
+
+  const session = useMemo(
+    () =>
+      isCustom
+        ? buildCustomSession(dk, program.level, customKeys)
+        : generateSession(dk, program.level),
+    [dk, program.level, isCustom, customKeys]
+  )
   const checked = sessions?.[dk]?.checked || {}
 
+  // Salt-listeleme (hazır moddan) veya seçim modu (kendi programından)
   if (view === 'library') {
     return <ExerciseLibrary onExit={() => setView('session')} />
+  }
+  if (view === 'picker') {
+    return (
+      <ExerciseLibrary
+        selectable
+        selectedKeys={customKeys}
+        onToggleSelect={onToggleExercise}
+        onExit={() => setView('session')}
+      />
+    )
   }
 
   const doneCount = session.countableIds.filter((id) => checked[id]).length
@@ -72,9 +99,28 @@ export default function Training({ program, sessions, onToggleItem, onSetLevel }
 
   const completedSince = completedTrainingDaysSince(sessions, program.levelSince)
   const canLevelUp = program.level < 4 && completedSince >= LEVEL_UP_SESSIONS
+  const customEmpty = isCustom && session.moveCount === 0
 
   return (
     <>
+      {/* Mod seçimi: hazır program / kendim seçerim */}
+      <div className="card">
+        <div className="mode-switch">
+          <button
+            className={`mode-tab ${!isCustom ? 'active' : ''}`}
+            onClick={() => onSetMode('auto')}
+          >
+            Hazır program
+          </button>
+          <button
+            className={`mode-tab ${isCustom ? 'active' : ''}`}
+            onClick={() => onSetMode('custom')}
+          >
+            Kendim seçerim
+          </button>
+        </div>
+      </div>
+
       {/* Seans başlığı */}
       <div className="card">
         <div className="session-head">
@@ -105,6 +151,20 @@ export default function Training({ program, sessions, onToggleItem, onSetLevel }
         )}
       </div>
 
+      {/* Kendi seçim modu: hareket seç/düzenle */}
+      {isCustom && (
+        <div className="card">
+          <button className="btn-add mode-btn" onClick={() => setView('picker')}>
+            {customEmpty ? '➕ Hareketlerini seç' : '✏️ Hareketleri düzenle'}
+            <span className="mode-sub">
+              {customEmpty
+                ? 'Tüm hareketler arasından kendi antrenmanını kur'
+                : `${session.moveCount} hareket seçtin — değiştirmek için dokun`}
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* Seviye atlama önerisi */}
       {canLevelUp && (
         <div className="card levelup">
@@ -120,29 +180,40 @@ export default function Training({ program, sessions, onToggleItem, onSetLevel }
       )}
 
       {/* Bloklar */}
-      {session.blocks.map((block) => (
-        <div className="card" key={block.title}>
-          <h2>{block.title}</h2>
-          {block.items.map((it) => (
-            <ExerciseItem
-              key={it.id}
-              item={it}
-              checked={!!checked[it.id]}
-              onToggle={() => onToggleItem(it.id, session.countableIds)}
-            />
-          ))}
+      {customEmpty ? (
+        <div className="card">
+          <div className="empty">
+            Henüz hareket seçmedin. Yukarıdaki “Hareketlerini seç” ile başla — ısınma ve
+            soğuma senin için hazır.
+          </div>
         </div>
-      ))}
+      ) : (
+        session.blocks.map((block) => (
+          <div className="card" key={block.title}>
+            <h2>{block.title}</h2>
+            {block.items.map((it) => (
+              <ExerciseItem
+                key={it.id}
+                item={it}
+                checked={!!checked[it.id]}
+                onToggle={() => onToggleItem(it.id, session.countableIds)}
+              />
+            ))}
+          </div>
+        ))
+      )}
 
-      {/* Tüm hareketler kütüphanesi */}
-      <div className="card">
-        <button className="mode-btn ghost" onClick={() => setView('library')}>
-          📚 Tüm hareketler ({TOTAL_MOVE_COUNT})
-          <span className="mode-sub">
-            Günlük seans bunlardan seçilir — hepsini seviye ve tarifleriyle gör
-          </span>
-        </button>
-      </div>
+      {/* Tüm hareketler kütüphanesi (salt-listeleme, hazır modda) */}
+      {!isCustom && (
+        <div className="card">
+          <button className="mode-btn ghost" onClick={() => setView('library')}>
+            📚 Tüm hareketler ({TOTAL_MOVE_COUNT})
+            <span className="mode-sub">
+              Günlük seans bunlardan seçilir — hepsini seviye ve tarifleriyle gör
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Program bilgi / seviye kontrolü */}
       <div className="card">

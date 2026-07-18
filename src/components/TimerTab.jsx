@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { fmtTime } from '../lib/date'
 import { notifications } from '../lib/notifications'
+import NotificationSettings from './NotificationSettings'
 
 const QUICK = [5, 10, 20, 25, 45]
 
@@ -89,6 +90,8 @@ export default function TimerTab({ timer, alarms, onAddAlarm, onDelAlarm }) {
             : 'Tarayıcıda hatırlatmalar yalnızca bu sayfa açıkken çalar. Gerçek arka plan alarmı için uygulamayı telefona kurmalısın.'}
         </div>
       </div>
+
+      <NotificationSettings />
     </>
   )
 }

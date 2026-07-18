@@ -22,6 +22,8 @@ export default function App() {
     delTask,
     toggleSessionItem,
     setLevel,
+    setProgramMode,
+    toggleCustomExercise,
     setActiveLang,
     rateCard,
     importDeck,
@@ -115,6 +117,8 @@ export default function App() {
           sessions={data.sessions}
           onToggleItem={toggleSessionItem}
           onSetLevel={setLevel}
+          onSetMode={setProgramMode}
+          onToggleExercise={toggleCustomExercise}
         />
       )}
 
