@@ -703,6 +703,13 @@ export function getLibrary() {
 // Kütüphanedeki toplam hareket sayısı (ısınma/soğuma hariç ana hareketler).
 export const TOTAL_MOVE_COUNT = Object.keys(MOVES).length
 
+// Bir hareket için hedefli YouTube arama bağlantısı üretir. Belirli video ID
+// gömmek yerine arama linki kullanıyoruz: link asla ölmez, sonuç hep güncel.
+export function videoUrl(name, extra = 'nasıl yapılır doğru teknik') {
+  const q = `${name} ${extra}`.trim()
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`
+}
+
 // ---- Reçete ayrıştırma (rehberli antrenman için) ----
 // "detail" metnini yapısal veriye çevirir: kaç set, tekrar mı süre mi, kaç sn.
 // Örn: "3 set × 12" → {sets:3, reps:12}, "3 × 30 sn" → {sets:3, seconds:30},

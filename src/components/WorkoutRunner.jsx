@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { parsePrescription } from '../data/program'
 import ExerciseFigure from './ExerciseFigure'
+import ExerciseVideoLink from './ExerciseVideoLink'
 import { playBeep } from '../lib/sound'
 
 function fmt(s) {
@@ -193,6 +194,10 @@ export default function WorkoutRunner({ session, checked, onToggleItem, onExit }
             </button>
           </>
         )}
+
+        <div style={{ marginTop: 10 }}>
+          <ExerciseVideoLink name={cur.name} label="▶ Bu hareketin videosu" />
+        </div>
 
         <button className="run-skip" onClick={() => finishExercise(false)}>
           Bu hareketi geç

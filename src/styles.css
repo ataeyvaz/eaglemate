@@ -1169,3 +1169,32 @@ button {
   font-weight: 600;
   padding: 6px;
 }
+
+/* ---- Hareket video bağlantısı ---- */
+.ex-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-top: 4px;
+}
+.ex-video {
+  background: none;
+  border: none;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 2px 0;
+  cursor: pointer;
+}
+.ex-video.block {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 11px;
+  border-radius: 10px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid var(--green);
+  font-size: 14px;
+}

@@ -9,6 +9,7 @@ import {
 } from '../data/program'
 import ExerciseFigure from './ExerciseFigure'
 import ExerciseLibrary from './ExerciseLibrary'
+import ExerciseVideoLink from './ExerciseVideoLink'
 import WorkoutRunner from './WorkoutRunner'
 
 // Tek egzersiz satırı: şekil + işaretleme + "nasıl yapılır?" açılır tarifi.
@@ -39,11 +40,14 @@ function ExerciseItem({ item, checked, onToggle }) {
           </span>
           {item.note && <span className="ex-note">{item.note}</span>}
           {item.caution && <span className="ex-caution">⚠️ {item.caution}</span>}
-          {item.steps && (
-            <button className="ex-how" onClick={() => setOpen((o) => !o)}>
-              {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
-            </button>
-          )}
+          <div className="ex-links">
+            {item.steps && (
+              <button className="ex-how" onClick={() => setOpen((o) => !o)}>
+                {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
+              </button>
+            )}
+            <ExerciseVideoLink name={item.name} />
+          </div>
         </div>
       </div>
       {open && item.steps && (

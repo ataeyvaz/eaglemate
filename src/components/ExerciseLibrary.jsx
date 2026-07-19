@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
-import { getLibrary, TOTAL_MOVE_COUNT } from '../data/program'
+import { getLibrary, TOTAL_MOVE_COUNT, videoUrl } from '../data/program'
 import ExerciseFigure from './ExerciseFigure'
+import ExerciseVideoLink from './ExerciseVideoLink'
+import { openExternal } from '../lib/openUrl'
 
 // Tek kütüphane kartı: figür + isim + (varsa) 4 seviye + açılır tarif.
 // selectable ise sağda seç/kaldır (+ / ✓) düğmesi gösterir.
@@ -33,11 +35,14 @@ function LibraryItem({ item, selectable, selected, onToggleSelect }) {
         )}
 
         {item.caution && <span className="ex-caution">⚠️ {item.caution}</span>}
-        {item.steps && (
-          <button className="ex-how" onClick={() => setOpen((o) => !o)}>
-            {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
-          </button>
-        )}
+        <div className="ex-links">
+          {item.steps && (
+            <button className="ex-how" onClick={() => setOpen((o) => !o)}>
+              {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
+            </button>
+          )}
+          <ExerciseVideoLink name={item.name} />
+        </div>
         {open && item.steps && (
           <ol className="ex-steps">
             {item.steps.map((s, i) => (
@@ -83,11 +88,19 @@ export default function ExerciseLibrary({
 
       <div className="card">
         <h2>{selectable ? 'Hareket seç' : 'Tüm hareketler'}</h2>
-        <p className="session-sub">
+        <p className="session-sub" style={{ marginBottom: 10 }}>
           {selectable
             ? 'Yapmak istediklerini + ile ekle. Dengeli olması için en az bir bacak, bir üst vücut ve bir core hareketi seçmeni öneririm. Isınma ve soğuma her zaman eklenir.'
-            : 'Günlük seans bu havuzdan rotasyonla seçilir; burada hepsini seviyeleri ve tarifleriyle görebilirsin.'}
+            : 'Her hareketin yanında "▶ Videoyu izle" ile o hareketin doğru tekniğini YouTube\'da açabilirsin.'}
         </p>
+        <button
+          className="ex-video block"
+          onClick={() =>
+            openExternal(videoUrl('çocuklar gençler için vücut ağırlığı tüm vücut antrenman', ''))
+          }
+        >
+          ▶ Tüm vücut antrenman videosu (tümü sırayla)
+        </button>
       </div>
 
       {sections.map((sec) => (
