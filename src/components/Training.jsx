@@ -46,7 +46,7 @@ function ExerciseItem({ item, checked, onToggle }) {
                 {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
               </button>
             )}
-            <ExerciseVideoLink name={item.name} />
+            <ExerciseVideoLink moveKey={item.key} name={item.name} />
           </div>
         </div>
       </div>

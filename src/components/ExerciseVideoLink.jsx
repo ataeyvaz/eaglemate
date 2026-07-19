@@ -1,16 +1,22 @@
-import { videoUrl } from '../data/program'
+import { resolveVideoUrl } from '../data/program'
 import { openExternal } from '../lib/openUrl'
 
-// Bir hareketin YouTube video (arama) bağlantısını açan küçük düğme.
-export default function ExerciseVideoLink({ name, label = '▶ Videoyu izle', className = 'ex-video' }) {
-  if (!name) return null
+// Bir hareketin YouTube video bağlantısını açan küçük düğme.
+// moveKey varsa araştırılmış tekil video; yoksa isimle arama bağlantısı.
+export default function ExerciseVideoLink({
+  moveKey,
+  name,
+  label = '▶ Videoyu izle',
+  className = 'ex-video',
+}) {
+  if (!name && !moveKey) return null
   return (
     <button
       type="button"
       className={className}
       onClick={(e) => {
         e.stopPropagation()
-        openExternal(videoUrl(name))
+        openExternal(resolveVideoUrl(moveKey, name))
       }}
     >
       {label}

@@ -538,6 +538,7 @@ function moveItem(dateKey, key, level) {
   const v = mv.levels[clampLevel(level)]
   return {
     id: `${dateKey}|${key}`,
+    key,
     name: mv.name,
     variant: v.label,
     detail: v.detail,
@@ -553,6 +554,7 @@ function moveItem(dateKey, key, level) {
 function fixedItem(dateKey, item) {
   return {
     id: `${dateKey}|${item.key}`,
+    key: item.key,
     name: item.name,
     detail: item.detail,
     note: item.note || null,
@@ -703,11 +705,58 @@ export function getLibrary() {
 // Kütüphanedeki toplam hareket sayısı (ısınma/soğuma hariç ana hareketler).
 export const TOTAL_MOVE_COUNT = Object.keys(MOVES).length
 
-// Bir hareket için hedefli YouTube arama bağlantısı üretir. Belirli video ID
-// gömmek yerine arama linki kullanıyoruz: link asla ölmez, sonuç hep güncel.
+// Her hareket için ARAŞTIRILMIŞ, tekil (o hareketin kendisini gösteren) YouTube
+// video bağlantısı. Çoğu Türkçe "... nasıl yapılır" tekniği; 1-3 dk hedefli.
+// Bulunamayan (ör. denge) için ilgili arama bağlantısına düşülür.
+export const MOVE_VIDEOS = {
+  // Bacak
+  squat: 'https://youtu.be/EI2kwv_jmMY',
+  lunge: 'https://youtu.be/GmZXZgLmxhM',
+  wallsit: 'https://youtu.be/jwsvrdmqDIs',
+  stepup: 'https://youtu.be/ihhlKOvWyKY',
+  calfraise: 'https://youtu.be/Je7M0ceHZGg',
+  // İtiş
+  pushup: 'https://youtu.be/oXw-TFiFpCk',
+  tricepsdip: 'https://youtu.be/cr7A38mpmpQ',
+  pikepush: 'https://youtu.be/W4KYA4b9BRk',
+  // Sırt & kalça
+  glutebridge: 'https://youtu.be/47ZMn1xiJb4',
+  superman: 'https://youtu.be/5II002_3ZrM',
+  towelrow: 'https://youtu.be/hTGEod5Izfk',
+  reverseplank: 'https://youtu.be/5VawBJ7xzDs',
+  // Merkez (core)
+  plank: 'https://youtu.be/zN4ztr3IFCI',
+  sideplank: 'https://youtu.be/H-e2HMyUOFA',
+  deadbug: 'https://youtu.be/ZBMFwWSuVK0',
+  birddog: 'https://youtu.be/Wy0qt2ZHi88',
+  hollowhold: 'https://youtu.be/T6KnV6e9mVM',
+  mountainclimber: 'https://youtu.be/eD9zxp9TxgQ',
+  // Futbol & çeviklik
+  fastfeet: 'https://youtu.be/YhA8Z_TRjOs',
+  highknees: 'https://youtu.be/D9cWcl4L4Co',
+  shuffle: 'https://youtu.be/mziPKITnPeQ',
+  carioca: 'https://youtu.be/R3__Q_SulyM',
+  balltap: 'https://youtu.be/Fr_T7GX6Xhs',
+  // Gölge boksu
+  stance: 'https://youtu.be/VSVCVX3UTrs',
+  footwork: 'https://youtu.be/10agBgaJ1zY',
+  jab: 'https://youtu.be/8dKcaHtaqZo',
+  cross: 'https://youtu.be/8dKcaHtaqZo',
+  hook: 'https://youtu.be/xWvcuIb194U',
+  jabcross: 'https://youtu.be/vyTaKpylOcU',
+  slip: 'https://youtu.be/1MHZmrr2tWc',
+  shadowround: 'https://youtu.be/WWr3Ep-CX2w',
+}
+
+// Bir hareket için hedefli YouTube arama bağlantısı üretir (yedek).
 export function videoUrl(name, extra = 'nasıl yapılır doğru teknik') {
   const q = `${name} ${extra}`.trim()
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`
+}
+
+// Hareketin videosunu çözer: önce araştırılmış tekil video, yoksa arama linki.
+export function resolveVideoUrl(key, name) {
+  return (key && MOVE_VIDEOS[key]) || videoUrl(name)
 }
 
 // ---- Reçete ayrıştırma (rehberli antrenman için) ----

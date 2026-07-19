@@ -41,7 +41,7 @@ function LibraryItem({ item, selectable, selected, onToggleSelect }) {
               {open ? '▾ Nasıl yapılır?' : '▸ Nasıl yapılır?'}
             </button>
           )}
-          <ExerciseVideoLink name={item.name} />
+          <ExerciseVideoLink moveKey={item.key} name={item.name} />
         </div>
         {open && item.steps && (
           <ol className="ex-steps">

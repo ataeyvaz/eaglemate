@@ -196,7 +196,7 @@ export default function WorkoutRunner({ session, checked, onToggleItem, onExit }
         )}
 
         <div style={{ marginTop: 10 }}>
-          <ExerciseVideoLink name={cur.name} label="▶ Bu hareketin videosu" />
+          <ExerciseVideoLink moveKey={cur.key} name={cur.name} label="▶ Bu hareketin videosu" />
         </div>
 
         <button className="run-skip" onClick={() => finishExercise(false)}>
