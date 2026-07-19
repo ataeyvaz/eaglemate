@@ -11,6 +11,7 @@ import { audioStore } from '../lib/audioStore'
 const STORAGE_KEY = 'eaglemate-data'
 
 const emptyData = {
+  profile: { name: 'Kartal' }, // motivasyon için kişisel isim
   today: [], // "Bugün" sekmesindeki serbest günlük görevler
   alarms: [],
   log: {}, //      { 'YYYY-MM-DD': { done, total } }
@@ -68,6 +69,7 @@ export function useEagleState() {
           setData({
             ...emptyData,
             ...parsed,
+            profile: { ...emptyData.profile, ...(parsed.profile || {}) },
             program: { ...emptyData.program, ...(parsed.program || {}) },
             lang: {
               ...emptyData.lang,
@@ -100,6 +102,7 @@ export function useEagleState() {
         .set(
           STORAGE_KEY,
           JSON.stringify({
+            profile: data.profile,
             today: data.today,
             alarms: data.alarms,
             log: data.log,
@@ -119,6 +122,12 @@ export function useEagleState() {
   const withUpdatedLog = useCallback((next) => {
     const { done, total } = dayCounts(next)
     return { ...next, log: { ...next.log, [todayKey()]: { done, total } } }
+  }, [])
+
+  // ---- Profil ----
+  const setName = useCallback((name) => {
+    const n = (name || '').trim() || 'Kartal'
+    setData((prev) => ({ ...prev, profile: { ...prev.profile, name: n } }))
   }, [])
 
   // ---- Serbest günlük görev aksiyonları ("Bugün" sekmesi) ----
@@ -358,6 +367,7 @@ export function useEagleState() {
     addTask,
     toggleTask,
     delTask,
+    setName,
     toggleSessionItem,
     setLevel,
     setProgramMode,

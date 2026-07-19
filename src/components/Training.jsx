@@ -9,6 +9,7 @@ import {
 } from '../data/program'
 import ExerciseFigure from './ExerciseFigure'
 import ExerciseLibrary from './ExerciseLibrary'
+import WorkoutRunner from './WorkoutRunner'
 
 // Tek egzersiz satırı: şekil + işaretleme + "nasıl yapılır?" açılır tarifi.
 function ExerciseItem({ item, checked, onToggle }) {
@@ -65,7 +66,7 @@ export default function Training({
   onSetMode,
   onToggleExercise,
 }) {
-  const [view, setView] = useState('session') // session | library | picker
+  const [view, setView] = useState('session') // session | picker | run
   const dk = todayKey()
   const isCustom = program.mode === 'custom'
   const customKeys = program.customKeys || []
@@ -79,16 +80,28 @@ export default function Training({
   )
   const checked = sessions?.[dk]?.checked || {}
 
-  // Salt-listeleme (hazır moddan) veya seçim modu (kendi programından)
-  if (view === 'library') {
-    return <ExerciseLibrary onExit={() => setView('session')} />
+  // Hareket listesi + seçim: her zaman seçilebilir. Hazır moddayken bir hareket
+  // seçilince otomatik "Kendim seçerim" moduna geçer (seçim listeden çalışsın).
+  function handleSelect(key) {
+    if (!isCustom) onSetMode('custom')
+    onToggleExercise(key)
   }
   if (view === 'picker') {
     return (
       <ExerciseLibrary
         selectable
         selectedKeys={customKeys}
-        onToggleSelect={onToggleExercise}
+        onToggleSelect={handleSelect}
+        onExit={() => setView('session')}
+      />
+    )
+  }
+  if (view === 'run') {
+    return (
+      <WorkoutRunner
+        session={session}
+        checked={checked}
+        onToggleItem={onToggleItem}
         onExit={() => setView('session')}
       />
     )
@@ -151,6 +164,16 @@ export default function Training({
         )}
       </div>
 
+      {/* Rehberli antrenman başlat */}
+      {total > 0 && (
+        <div className="card">
+          <button className="btn-start start-workout" onClick={() => setView('run')}>
+            ▶ {session.isTraining ? 'Antrenmana başla' : 'Esnemeye başla'}
+            <span className="mode-sub">Sayaç, set ve tekrar takibiyle adım adım</span>
+          </button>
+        </div>
+      )}
+
       {/* Kendi seçim modu: hareket seç/düzenle */}
       {isCustom && (
         <div className="card">
@@ -203,13 +226,13 @@ export default function Training({
         ))
       )}
 
-      {/* Tüm hareketler kütüphanesi (salt-listeleme, hazır modda) */}
+      {/* Tüm hareketler — görüntüle ve seç (seçince kendi programına geçer) */}
       {!isCustom && (
         <div className="card">
-          <button className="mode-btn ghost" onClick={() => setView('library')}>
+          <button className="mode-btn ghost" onClick={() => setView('picker')}>
             📚 Tüm hareketler ({TOTAL_MOVE_COUNT})
             <span className="mode-sub">
-              Günlük seans bunlardan seçilir — hepsini seviye ve tarifleriyle gör
+              Hepsini seviye ve tarifleriyle gör — beğendiğini + ile kendi programına ekle
             </span>
           </button>
         </div>

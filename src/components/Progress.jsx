@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { dayKey, weekdayShort } from '../lib/date'
 import { computeStreak } from '../hooks/useEagleState'
 
-// Son 7 günün performans grafiği + toplam istatistikler.
-export default function Progress({ log }) {
+// Son 7 günün performans grafiği + toplam istatistikler + isim.
+export default function Progress({ log, name, onSetName }) {
+  const [draft, setDraft] = useState(name || '')
   const days = []
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
@@ -43,6 +45,27 @@ export default function Progress({ log }) {
       <div className="badge-note">
         İpucu: Bir günü %100 tamamlayınca seri artar. Seriyi bozmamak oyunun asıl hedefi!
       </div>
+
+      {onSetName && (
+        <div className="card">
+          <h2>İsmin</h2>
+          <div className="row" style={{ marginBottom: 0 }}>
+            <input
+              type="text"
+              placeholder="Adın"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && onSetName(draft)}
+            />
+            <button className="btn-add" onClick={() => onSetName(draft)}>
+              Kaydet
+            </button>
+          </div>
+          <p className="session-sub" style={{ marginTop: 8 }}>
+            Üstteki selamlamada bu isim görünür.
+          </p>
+        </div>
+      )}
     </>
   )
 }

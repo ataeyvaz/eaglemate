@@ -1065,3 +1065,107 @@ button {
   background: var(--panel-2);
   color: var(--muted);
 }
+
+/* ---- Rehberli antrenman (WorkoutRunner) ---- */
+.start-workout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  padding: 15px 16px;
+  border-radius: 11px;
+  font-size: 16px;
+}
+.start-workout .mode-sub {
+  color: #04343d;
+}
+.run-figure {
+  width: 120px;
+  height: 100px;
+  margin: 0 auto 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan);
+}
+.run-figure.big {
+  width: 150px;
+  height: 130px;
+}
+.run-setline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+.set-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+.set-dot.done {
+  background: var(--green);
+  border-color: var(--green);
+}
+.set-dot.cur {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+}
+.run-setnum {
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+.run-timer {
+  font-family: 'Oswald', sans-serif;
+  font-size: 64px;
+  color: #fff;
+  line-height: 1.1;
+  margin: 8px 0;
+}
+.run-timer.rest {
+  color: var(--amber);
+}
+.run-rest-label {
+  font-size: 14px;
+  color: var(--amber);
+  font-weight: 700;
+  margin-top: 8px;
+}
+.run-reps {
+  font-size: 20px;
+  color: var(--text);
+  margin: 16px 0;
+}
+.run-reps b {
+  font-family: 'Oswald', sans-serif;
+  font-size: 48px;
+  color: var(--cyan);
+  display: block;
+}
+.run-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 11px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+.run-skip {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px;
+}

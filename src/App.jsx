@@ -18,6 +18,7 @@ export default function App() {
   const {
     data,
     loaded,
+    setName,
     addTask,
     toggleTask,
     delTask,
@@ -98,7 +99,7 @@ export default function App() {
 
   return (
     <div className="wrap">
-      <Header pct={pct} streak={streak} />
+      <Header pct={pct} streak={streak} name={data.profile?.name} />
       <Tabs active={tab} onChange={setTab} />
 
       {tab === 'today' && (
@@ -155,7 +156,9 @@ export default function App() {
         />
       )}
 
-      {tab === 'progress' && <Progress log={data.log} />}
+      {tab === 'progress' && (
+        <Progress log={data.log} name={data.profile?.name} onSetName={setName} />
+      )}
 
       <Toast message={toast} />
     </div>

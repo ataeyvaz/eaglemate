@@ -1,5 +1,13 @@
-// Üst başlık: tamamlanma yüzdesi halkası + seri sayısı.
-export default function Header({ pct, streak }) {
+// Üst başlık: tamamlanma halkası + isimli selamlama + seri.
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 6) return 'İyi geceler'
+  if (h < 12) return 'Günaydın'
+  if (h < 18) return 'İyi günler'
+  return 'İyi akşamlar'
+}
+
+export default function Header({ pct, streak, name }) {
   const r = 30
   const circ = 2 * Math.PI * r
   const offset = circ - (pct / 100) * circ
@@ -21,8 +29,10 @@ export default function Header({ pct, streak }) {
         <div className="ring-label">%{pct}</div>
       </div>
       <div className="title-block">
-        <h1 className="display">EagleMate</h1>
-        <p>🔥 {streak} günlük seri</p>
+        <h1 className="display">
+          {greeting()}, {name || 'Kartal'} 🦅
+        </h1>
+        <p>🔥 {streak} günlük seri · EagleMate</p>
       </div>
     </div>
   )

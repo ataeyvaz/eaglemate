@@ -702,3 +702,34 @@ export function getLibrary() {
 
 // Kütüphanedeki toplam hareket sayısı (ısınma/soğuma hariç ana hareketler).
 export const TOTAL_MOVE_COUNT = Object.keys(MOVES).length
+
+// ---- Reçete ayrıştırma (rehberli antrenman için) ----
+// "detail" metnini yapısal veriye çevirir: kaç set, tekrar mı süre mi, kaç sn.
+// Örn: "3 set × 12" → {sets:3, reps:12}, "3 × 30 sn" → {sets:3, seconds:30},
+// "20 sn / bacak" → {sets:1, seconds:20, perSide:true}, "5 nefes" → {sets:1, reps:5}.
+export function parsePrescription(detail = '') {
+  const d = String(detail).toLowerCase()
+  const perSide = /\/\s*(bacak|yön|yon|taraf)/.test(d)
+
+  let sets = 1
+  const setsM = d.match(/(\d+)\s*(?:set|tur)\b/) || d.match(/^\s*(\d+)\s*[×x]/)
+  if (setsM) sets = parseInt(setsM[1], 10)
+
+  const snM = d.match(/(\d+)\s*sn/)
+  if (snM) {
+    return { sets, timed: true, seconds: parseInt(snM[1], 10), reps: null, perSide, raw: detail }
+  }
+  const dkM = d.match(/(\d+)(?:\s*-\s*\d+)?\s*dk/)
+  if (dkM) {
+    return { sets: 1, timed: true, seconds: parseInt(dkM[1], 10) * 60, reps: null, perSide, raw: detail }
+  }
+
+  let reps = null
+  const repsM =
+    d.match(/[×x]\s*(\d+)/) ||
+    d.match(/(\d+)\s*tekrar/) ||
+    d.match(/^\s*(\d+)\s*\//) ||
+    d.match(/(\d+)\s*nefes/)
+  if (repsM) reps = parseInt(repsM[1], 10)
+  return { sets, timed: false, seconds: null, reps, perSide, raw: detail }
+}
